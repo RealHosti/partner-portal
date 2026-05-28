@@ -18,6 +18,12 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+    env:
+      NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL || vars.NEXT_PUBLIC_SUPABASE_URL }}
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY || vars.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+      NEXT_PUBLIC_PORTAL_CHAT_ROOM_ID: partner-lounge
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -37,12 +43,14 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Verify production config
+        run: |
+          test -n "$NEXT_PUBLIC_SUPABASE_URL" || (echo "::error::NEXT_PUBLIC_SUPABASE_URL is missing" && exit 1)
+          test -n "$NEXT_PUBLIC_SUPABASE_ANON_KEY" || (echo "::error::NEXT_PUBLIC_SUPABASE_ANON_KEY is missing" && exit 1)
+          echo "Supabase public config is present."
+
       - name: Build static app
         run: pnpm build
-        env:
-          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
-          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
-          NEXT_PUBLIC_PORTAL_CHAT_ROOM_ID: partner-lounge
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
