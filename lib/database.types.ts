@@ -17,6 +17,23 @@ export interface Database {
           twitch_display_name: string | null
           twitch_avatar_url: string | null
           twitch_email: string | null
+          app_role: string
+          profile_visibility: string
+          employment_title: string | null
+          company_role: string | null
+          department: string | null
+          industry: string | null
+          country: string | null
+          city: string | null
+          about: string | null
+          contact_email: string | null
+          mobile_phone: string | null
+          phone: string | null
+          company_website: string | null
+          company_address: string | null
+          preferred_contact_method: string | null
+          social_links: Json
+          profile_completed_at: string | null
           is_admin: boolean
           is_partner: boolean
           bio: string | null
@@ -30,6 +47,23 @@ export interface Database {
           twitch_display_name?: string | null
           twitch_avatar_url?: string | null
           twitch_email?: string | null
+          app_role?: string
+          profile_visibility?: string
+          employment_title?: string | null
+          company_role?: string | null
+          department?: string | null
+          industry?: string | null
+          country?: string | null
+          city?: string | null
+          about?: string | null
+          contact_email?: string | null
+          mobile_phone?: string | null
+          phone?: string | null
+          company_website?: string | null
+          company_address?: string | null
+          preferred_contact_method?: string | null
+          social_links?: Json
+          profile_completed_at?: string | null
           is_admin?: boolean
           is_partner?: boolean
           bio?: string | null
@@ -43,9 +77,122 @@ export interface Database {
           twitch_display_name?: string | null
           twitch_avatar_url?: string | null
           twitch_email?: string | null
+          app_role?: string
+          profile_visibility?: string
+          employment_title?: string | null
+          company_role?: string | null
+          department?: string | null
+          industry?: string | null
+          country?: string | null
+          city?: string | null
+          about?: string | null
+          contact_email?: string | null
+          mobile_phone?: string | null
+          phone?: string | null
+          company_website?: string | null
+          company_address?: string | null
+          preferred_contact_method?: string | null
+          social_links?: Json
+          profile_completed_at?: string | null
           is_admin?: boolean
           is_partner?: boolean
           bio?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      companies: {
+        Row: {
+          id: string
+          owner_id: string
+          name: string
+          slug: string
+          website: string | null
+          industry: string | null
+          country: string | null
+          city: string | null
+          address: string | null
+          description: string | null
+          status: string
+          reviewed_by: string | null
+          reviewed_at: string | null
+          rejection_reason: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          owner_id: string
+          name: string
+          slug: string
+          website?: string | null
+          industry?: string | null
+          country?: string | null
+          city?: string | null
+          address?: string | null
+          description?: string | null
+          status?: string
+          reviewed_by?: string | null
+          reviewed_at?: string | null
+          rejection_reason?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          owner_id?: string
+          name?: string
+          slug?: string
+          website?: string | null
+          industry?: string | null
+          country?: string | null
+          city?: string | null
+          address?: string | null
+          description?: string | null
+          status?: string
+          reviewed_by?: string | null
+          reviewed_at?: string | null
+          rejection_reason?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      company_memberships: {
+        Row: {
+          id: string
+          company_id: string
+          profile_id: string
+          role_title: string | null
+          relationship_type: string
+          status: string
+          approved_by: string | null
+          approved_at: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          company_id: string
+          profile_id: string
+          role_title?: string | null
+          relationship_type?: string
+          status?: string
+          approved_by?: string | null
+          approved_at?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          company_id?: string
+          profile_id?: string
+          role_title?: string | null
+          relationship_type?: string
+          status?: string
+          approved_by?: string | null
+          approved_at?: string | null
           created_at?: string
           updated_at?: string
         }

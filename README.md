@@ -33,9 +33,20 @@ Der erste eingeloggte Admin muss in Supabase gesetzt werden:
 
 ```sql
 update public.profiles
-set is_admin = true
+set is_admin = true,
+    app_role = 'admin'
 where twitch_username = 'dein_twitch_name';
 ```
+
+Weitere Staff-/Moderationsrollen kannst du so vergeben:
+
+```sql
+update public.profiles
+set app_role = 'moderator'
+where twitch_username = 'twitch_name';
+```
+
+Firmenregistrierungen landen in `public.companies` mit `status = 'pending'` und werden im Portal von Staff/Moderatoren freigegeben.
 
 ## GitHub Pages
 

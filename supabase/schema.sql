@@ -7,11 +7,79 @@ create table if not exists public.profiles (
   twitch_display_name text,
   twitch_avatar_url text,
   twitch_email text,
+  app_role text not null default 'partner',
+  profile_visibility text not null default 'partners',
+  employment_title text,
+  company_role text,
+  department text,
+  industry text,
+  country text,
+  city text,
+  about text,
+  contact_email text,
+  mobile_phone text,
+  phone text,
+  company_website text,
+  company_address text,
+  preferred_contact_method text,
+  social_links jsonb not null default '{}'::jsonb,
+  profile_completed_at timestamptz,
   is_admin boolean not null default false,
   is_partner boolean not null default true,
   bio text,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
+);
+
+alter table public.profiles add column if not exists app_role text not null default 'partner';
+alter table public.profiles add column if not exists profile_visibility text not null default 'partners';
+alter table public.profiles add column if not exists employment_title text;
+alter table public.profiles add column if not exists company_role text;
+alter table public.profiles add column if not exists department text;
+alter table public.profiles add column if not exists industry text;
+alter table public.profiles add column if not exists country text;
+alter table public.profiles add column if not exists city text;
+alter table public.profiles add column if not exists about text;
+alter table public.profiles add column if not exists contact_email text;
+alter table public.profiles add column if not exists mobile_phone text;
+alter table public.profiles add column if not exists phone text;
+alter table public.profiles add column if not exists company_website text;
+alter table public.profiles add column if not exists company_address text;
+alter table public.profiles add column if not exists preferred_contact_method text;
+alter table public.profiles add column if not exists social_links jsonb not null default '{}'::jsonb;
+alter table public.profiles add column if not exists profile_completed_at timestamptz;
+
+create table if not exists public.companies (
+  id uuid primary key default gen_random_uuid(),
+  owner_id uuid not null references public.profiles (id) on delete cascade,
+  name text not null,
+  slug text unique not null,
+  website text,
+  industry text,
+  country text,
+  city text,
+  address text,
+  description text,
+  status text not null default 'pending',
+  reviewed_by uuid references public.profiles (id) on delete set null,
+  reviewed_at timestamptz,
+  rejection_reason text,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+create table if not exists public.company_memberships (
+  id uuid primary key default gen_random_uuid(),
+  company_id uuid not null references public.companies (id) on delete cascade,
+  profile_id uuid not null references public.profiles (id) on delete cascade,
+  role_title text,
+  relationship_type text not null default 'employee',
+  status text not null default 'pending',
+  approved_by uuid references public.profiles (id) on delete set null,
+  approved_at timestamptz,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now(),
+  unique (company_id, profile_id)
 );
 
 create table if not exists public.messages (
@@ -123,6 +191,63 @@ as $$
   );
 $$;
 
+create or replace function public.profile_role(user_id uuid)
+returns text
+language sql
+stable
+security definer
+set search_path = public
+as $$
+  select coalesce(
+    (
+      select app_role
+      from public.profiles
+      where id = user_id
+    ),
+    'guest'
+  );
+$$;
+
+create or replace function public.is_staff(user_id uuid)
+returns boolean
+language sql
+stable
+security definer
+set search_path = public
+as $$
+  select public.profile_role(user_id) in ('staff', 'moderator', 'admin') or public.is_admin(user_id);
+$$;
+
+create or replace function public.has_company_membership(user_id uuid, requested_company_id uuid)
+returns boolean
+language sql
+stable
+security definer
+set search_path = public
+as $$
+  select exists (
+    select 1
+    from public.company_memberships
+    where profile_id = user_id
+      and company_id = requested_company_id
+  );
+$$;
+
+create or replace function public.owns_company(user_id uuid, requested_company_id uuid)
+returns boolean
+language sql
+stable
+security definer
+set search_path = public
+as $$
+  select exists (
+    select 1
+    from public.companies
+    where id = requested_company_id
+      and owner_id = user_id
+  );
+$$;
+
 create or replace function public.handle_new_user()
 returns trigger
 language plpgsql
@@ -136,7 +261,8 @@ begin
     twitch_username,
     twitch_display_name,
     twitch_avatar_url,
-    twitch_email
+    twitch_email,
+    contact_email
   )
   values (
     new.id,
@@ -144,6 +270,7 @@ begin
     coalesce(new.raw_user_meta_data ->> 'preferred_username', new.raw_user_meta_data ->> 'user_name', new.raw_user_meta_data ->> 'login'),
     coalesce(new.raw_user_meta_data ->> 'full_name', new.raw_user_meta_data ->> 'name', new.raw_user_meta_data ->> 'display_name'),
     coalesce(new.raw_user_meta_data ->> 'avatar_url', new.raw_user_meta_data ->> 'picture', new.raw_user_meta_data ->> 'profile_image_url'),
+    new.email,
     new.email
   )
   on conflict (id) do update set
@@ -152,6 +279,7 @@ begin
     twitch_display_name = excluded.twitch_display_name,
     twitch_avatar_url = excluded.twitch_avatar_url,
     twitch_email = excluded.twitch_email,
+    contact_email = coalesce(public.profiles.contact_email, excluded.contact_email),
     updated_at = now();
 
   return new;
@@ -164,6 +292,8 @@ create trigger on_auth_user_created
   for each row execute function public.handle_new_user();
 
 alter table public.profiles enable row level security;
+alter table public.companies enable row level security;
+alter table public.company_memberships enable row level security;
 alter table public.messages enable row level security;
 alter table public.chat_messages enable row level security;
 alter table public.chat_rooms enable row level security;
@@ -182,13 +312,61 @@ create policy "profiles_select_authenticated" on public.profiles
 drop policy if exists "profiles_insert_self" on public.profiles;
 create policy "profiles_insert_self" on public.profiles
   for insert to authenticated
-  with check (auth.uid() = id);
+  with check (auth.uid() = id and app_role = 'partner' and is_admin = false);
 
 drop policy if exists "profiles_update_self_or_admin" on public.profiles;
 create policy "profiles_update_self_or_admin" on public.profiles
   for update to authenticated
-  using (auth.uid() = id or public.is_admin(auth.uid()))
-  with check (auth.uid() = id or public.is_admin(auth.uid()));
+  using (auth.uid() = id or public.is_staff(auth.uid()))
+  with check (
+    public.is_staff(auth.uid())
+    or (
+      auth.uid() = id
+      and app_role = public.profile_role(auth.uid())
+      and is_admin = public.is_admin(auth.uid())
+    )
+  );
+
+drop policy if exists "companies_select_visible" on public.companies;
+create policy "companies_select_visible" on public.companies
+  for select to authenticated
+  using (
+    status = 'approved'
+    or owner_id = auth.uid()
+    or public.is_staff(auth.uid())
+    or public.has_company_membership(auth.uid(), id)
+  );
+
+drop policy if exists "companies_insert_self" on public.companies;
+create policy "companies_insert_self" on public.companies
+  for insert to authenticated
+  with check (owner_id = auth.uid() and status = 'pending');
+
+drop policy if exists "companies_update_owner_pending_or_staff" on public.companies;
+create policy "companies_update_owner_pending_or_staff" on public.companies
+  for update to authenticated
+  using (public.is_staff(auth.uid()) or (owner_id = auth.uid() and status = 'pending'))
+  with check (public.is_staff(auth.uid()) or (owner_id = auth.uid() and status = 'pending'));
+
+drop policy if exists "company_memberships_select_related" on public.company_memberships;
+create policy "company_memberships_select_related" on public.company_memberships
+  for select to authenticated
+  using (
+    profile_id = auth.uid()
+    or public.is_staff(auth.uid())
+    or public.owns_company(auth.uid(), company_id)
+  );
+
+drop policy if exists "company_memberships_insert_self" on public.company_memberships;
+create policy "company_memberships_insert_self" on public.company_memberships
+  for insert to authenticated
+  with check (profile_id = auth.uid() and status = 'pending');
+
+drop policy if exists "company_memberships_update_staff" on public.company_memberships;
+create policy "company_memberships_update_staff" on public.company_memberships
+  for update to authenticated
+  using (public.is_staff(auth.uid()))
+  with check (public.is_staff(auth.uid()));
 
 drop policy if exists "messages_select_related" on public.messages;
 create policy "messages_select_related" on public.messages

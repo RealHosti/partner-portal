@@ -1,6 +1,8 @@
 import { Database } from './database.types'
 
 export type Profile = Database['public']['Tables']['profiles']['Row']
+export type Company = Database['public']['Tables']['companies']['Row']
+export type CompanyMembership = Database['public']['Tables']['company_memberships']['Row']
 export type Message = Database['public']['Tables']['messages']['Row']
 export type ChatMessage = Database['public']['Tables']['chat_messages']['Row']
 export type ChatRoom = Database['public']['Tables']['chat_rooms']['Row']
@@ -13,6 +15,14 @@ export type BlogComment = Database['public']['Tables']['blog_comments']['Row']
 
 export type MessageType = 'request' | 'inquiry' | 'feedback'
 export type AppointmentStatus = 'pending' | 'confirmed' | 'cancelled' | 'completed'
+export type PortalRole = 'partner' | 'staff' | 'moderator' | 'admin'
+export type CompanyStatus = 'pending' | 'approved' | 'rejected'
+export type CompanyMembershipStatus = 'pending' | 'approved' | 'rejected'
+export type CompanyRelationshipType = 'employee' | 'agency' | 'influencer' | 'founder' | 'freelancer' | 'other'
+
+export interface CompanyMembershipWithCompany extends CompanyMembership {
+  company: Company
+}
 
 export interface MessageWithSender extends Message {
   sender: Profile
