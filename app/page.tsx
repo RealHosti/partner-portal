@@ -35,6 +35,7 @@ export default function HomePage() {
   useEffect(() => {
     const hash = window.location.hash.replace(/^#/, '')
     const queryIndex = hash.indexOf('?')
+    const hashPath = queryIndex >= 0 ? hash.slice(0, queryIndex) : hash
     const hashQuery =
       hash.startsWith('/auth/callback') && queryIndex >= 0
         ? hash.slice(queryIndex + 1)
@@ -44,6 +45,11 @@ export default function HomePage() {
 
     if (hashQuery) {
       router.replace(`/auth/callback/?${hashQuery}`)
+      return
+    }
+
+    if (hashPath.startsWith('/dashboard')) {
+      router.replace(hash)
     }
   }, [router])
 

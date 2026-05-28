@@ -49,15 +49,19 @@ jobs:
           test -n "$NEXT_PUBLIC_SUPABASE_ANON_KEY" || (echo "::error::NEXT_PUBLIC_SUPABASE_ANON_KEY is missing" && exit 1)
           echo "Supabase public config is present."
 
+      - name: Configure Pages
+        uses: actions/configure-pages@v5
+
       - name: Build static app
         run: pnpm build
 
       - name: Verify Pages artifact
         run: |
           test -f out/index.html || (echo "::error::out/index.html is missing" && exit 1)
+          test -f out/404.html || (echo "::error::out/404.html is missing" && exit 1)
           test -f out/CNAME || (echo "::error::out/CNAME is missing" && exit 1)
           grep -qx "partners.realhosti.de" out/CNAME || (echo "::error::out/CNAME has wrong domain" && exit 1)
-          echo "Pages artifact contains index.html and CNAME."
+          echo "Pages artifact contains index.html, 404.html and CNAME."
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
