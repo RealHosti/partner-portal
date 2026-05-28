@@ -52,6 +52,13 @@ jobs:
       - name: Build static app
         run: pnpm build
 
+      - name: Verify Pages artifact
+        run: |
+          test -f out/index.html || (echo "::error::out/index.html is missing" && exit 1)
+          test -f out/CNAME || (echo "::error::out/CNAME is missing" && exit 1)
+          grep -qx "partners.realhosti.de" out/CNAME || (echo "::error::out/CNAME has wrong domain" && exit 1)
+          echo "Pages artifact contains index.html and CNAME."
+
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
