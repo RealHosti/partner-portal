@@ -33,6 +33,11 @@ export default function HomePage() {
   const [hasSession, setHasSession] = useState(false)
 
   useEffect(() => {
+    if (window.location.search.includes('code=') || window.location.search.includes('error=')) {
+      router.replace(`/auth/callback/${window.location.search}`)
+      return
+    }
+
     const hash = window.location.hash.replace(/^#/, '')
     const queryIndex = hash.indexOf('?')
     const hashPath = queryIndex >= 0 ? hash.slice(0, queryIndex) : hash
