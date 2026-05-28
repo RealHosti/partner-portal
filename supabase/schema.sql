@@ -353,6 +353,7 @@ create policy "company_memberships_select_related" on public.company_memberships
   for select to authenticated
   using (
     profile_id = auth.uid()
+    or status = 'approved'
     or public.is_staff(auth.uid())
     or public.owns_company(auth.uid(), company_id)
   );

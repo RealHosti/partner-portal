@@ -1,9 +1,9 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { ArrowLeft, Loader2, Send } from 'lucide-react'
+import { ArrowLeft, Loader2, Send, UserRound } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -13,11 +13,68 @@ import { createClient } from '@/lib/supabase/client'
 import { isSupabaseConfigured } from '@/lib/supabase/config'
 import { usePortalSession } from '@/hooks/use-auth-profile'
 
+type RecipientOption = {
+  id: string
+  label: string
+  detail: string
+}
+
+const demoRecipients: RecipientOption[] = [
+  { id: 'demo-contact-zoe', label: 'Zoe Huang', detail: 'HOLLYLAND' },
+  { id: 'demo-contact-elyas', label: 'Elyas Fehri', detail: 'Nitrodo' },
+  { id: 'demo-contact-manmohen', label: 'Manmohen Singh', detail: 'Gcore' },
+]
+
 export default function NewMessagePage() {
   const router = useRouter()
   const { profile, isDemo } = usePortalSession()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [recipientId, setRecipientId] = useState('team')
+  const [recipients, setRecipients] = useState<RecipientOption[]>(demoRecipients)
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search)
+    const recipient = params.get('recipient')
+
+    if (recipient) {
+      setRecipientId(recipient)
+    }
+  }, [])
+
+  useEffect(() => {
+    let active = true
+
+    async function loadRecipients() {
+      if (!isSupabaseConfigured() || isDemo || !profile) {
+        setRecipients(demoRecipients)
+        return
+      }
+
+      const supabase = createClient()
+      const { data } = await supabase
+        .from('profiles')
+        .select('id,twitch_display_name,twitch_username,employment_title,company_role')
+        .neq('id', profile.id)
+        .order('twitch_display_name', { ascending: true })
+
+      if (!active) {
+        return
+      }
+
+      setRecipients((data ?? []).map((recipient) => ({
+        id: recipient.id,
+        label: recipient.twitch_display_name || recipient.twitch_username || 'Partner',
+        detail: recipient.employment_title || recipient.company_role || 'Partner Kontakt',
+      })))
+    }
+
+    void loadRecipients()
+
+    return () => {
+      active = false
+    }
+  }, [isDemo, profile])
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
@@ -28,6 +85,7 @@ export default function NewMessagePage() {
     const subject = String(formData.get('subject') ?? '')
     const content = String(formData.get('content') ?? '')
     const messageType = String(formData.get('messageType') ?? 'request')
+    const recipient = recipientId === 'team' ? null : recipientId
 
     if (!subject.trim() || !content.trim()) {
       setError('Bitte Betreff und Nachricht ausfuellen.')
@@ -50,7 +108,7 @@ export default function NewMessagePage() {
     const supabase = createClient()
     const { error: insertError } = await supabase.from('messages').insert({
       sender_id: profile.id,
-      recipient_id: null,
+      recipient_id: recipient,
       subject,
       content,
       message_type: messageType,
@@ -80,6 +138,28 @@ export default function NewMessagePage() {
       </div>
 
       <form onSubmit={handleSubmit} className="portal-panel space-y-5 p-5">
+        <div className="space-y-2">
+          <Label htmlFor="recipient">Empfaenger</Label>
+          <Select value={recipientId} onValueChange={setRecipientId}>
+            <SelectTrigger id="recipient" className="h-11 rounded-lg">
+              <SelectValue placeholder="Empfaenger waehlen" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="team">
+                <span className="inline-flex items-center gap-2">
+                  <UserRound className="size-4" />
+                  Realhosti Team
+                </span>
+              </SelectItem>
+              {recipients.map((recipient) => (
+                <SelectItem key={recipient.id} value={recipient.id}>
+                  {recipient.label} - {recipient.detail}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+
         <div className="grid gap-5 sm:grid-cols-[0.72fr_1.28fr]">
           <div className="space-y-2">
             <Label htmlFor="messageType">Typ</Label>

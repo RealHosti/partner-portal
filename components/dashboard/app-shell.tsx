@@ -5,6 +5,9 @@ import { usePathname, useRouter } from 'next/navigation'
 import {
   Bell,
   Calendar,
+  CheckCircle2,
+  ChevronRight,
+  ContactRound,
   Home,
   LogOut,
   MessageSquare,
@@ -21,9 +24,11 @@ import { Badge } from '@/components/ui/badge'
 import { createClient } from '@/lib/supabase/client'
 import { cn } from '@/lib/utils'
 import { PortalSessionProvider, usePortalSession } from '@/hooks/use-auth-profile'
+import { getProfileCompletion } from '@/lib/profile-completion'
 
 const navItems = [
   { href: '/dashboard', label: 'Hub', icon: Home },
+  { href: '/dashboard/contacts', label: 'Kontakte', icon: ContactRound },
   { href: '/dashboard/messages', label: 'Inbox', icon: MessageSquare },
   { href: '/dashboard/chat', label: 'Chat', icon: MessagesSquare },
   { href: '/dashboard/forum', label: 'Forum', icon: Users },
@@ -44,6 +49,7 @@ function DashboardChrome({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
   const router = useRouter()
   const { profile, status, isDemo, isConfigured } = usePortalSession()
+  const completion = getProfileCompletion(profile)
 
   const handleLogout = async () => {
     if (isConfigured) {
@@ -111,20 +117,38 @@ function DashboardChrome({ children }: { children: React.ReactNode }) {
           })}
         </nav>
 
-        <div className="border-t border-border/80 p-4">
-          <div className="portal-panel flex items-center gap-3 p-3">
-            <Avatar />
-            <div className="min-w-0 flex-1">
-              <p className="truncate text-sm font-semibold">{profile?.twitch_display_name ?? 'Partner'}</p>
-              <p className="truncate text-xs text-muted-foreground">@{profile?.twitch_username ?? 'twitch'}</p>
+        <div className="space-y-3 border-t border-border/80 p-4">
+          <Link href="/dashboard/settings" className="portal-panel block p-3 transition hover:border-primary/60">
+            <div className="flex items-center gap-3">
+              <Avatar />
+              <div className="min-w-0 flex-1">
+                <p className="truncate text-sm font-semibold">{profile?.twitch_display_name ?? 'Partner'}</p>
+                <p className="truncate text-xs text-muted-foreground">@{profile?.twitch_username ?? 'twitch'}</p>
+              </div>
+              {profile?.is_admin ? (
+                <Badge className="bg-primary text-primary-foreground">
+                  <Shield className="size-3" />
+                  Admin
+                </Badge>
+              ) : null}
             </div>
-            {profile?.is_admin ? (
-              <Badge className="bg-primary text-primary-foreground">
-                <Shield className="size-3" />
-                Admin
-              </Badge>
-            ) : null}
-          </div>
+            <div className="mt-4">
+              <div className="mb-2 flex items-center justify-between gap-2 text-xs">
+                <span className="text-muted-foreground">Profilstaerke</span>
+                <span className="font-semibold text-primary">{completion.percent}%</span>
+              </div>
+              <div className="h-1.5 overflow-hidden rounded-full bg-secondary">
+                <div className="h-full rounded-full bg-primary" style={{ width: `${completion.percent}%` }} />
+              </div>
+              <div className="mt-3 flex items-center justify-between text-xs text-muted-foreground">
+                <span className="inline-flex items-center gap-1">
+                  <CheckCircle2 className="size-3.5 text-primary" />
+                  {completion.missing.length ? `${completion.missing.length} offen` : 'vollstaendig'}
+                </span>
+                <ChevronRight className="size-4" />
+              </div>
+            </div>
+          </Link>
         </div>
       </aside>
 
