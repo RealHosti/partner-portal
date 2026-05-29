@@ -6,17 +6,12 @@ import type { ComponentType, ReactNode } from 'react'
 import {
   Bell,
   Bookmark,
-  Bot,
-  CircleEllipsis,
   Home,
-  MessageCircle,
   MoreHorizontal,
   PenLine,
-  Rocket,
+  Radio,
   Search,
-  UserPlus,
-  UserRound,
-  Zap,
+  UsersRound,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
@@ -31,6 +26,7 @@ import { createClient } from '@/lib/supabase/client'
 import { cn } from '@/lib/utils'
 import { PortalSessionProvider, usePortalSession } from '@/hooks/use-auth-profile'
 import { XAvatar } from '@/components/dashboard/x-ui'
+import { PortalSearch } from '@/components/dashboard/portal-search'
 
 type NavItem = {
   href: string
@@ -43,15 +39,9 @@ type NavItem = {
 const navItems: NavItem[] = [
   { href: '/dashboard', label: 'Home', icon: Home, route: '/dashboard' },
   { href: '/dashboard/forum', label: 'Explore', icon: Search, route: '/dashboard/forum' },
-  { href: '/dashboard/appointments', label: 'Notifications', icon: Bell, route: '/dashboard/appointments' },
-  { href: '/dashboard/contacts', label: 'Follow', icon: UserPlus, route: '/dashboard/contacts' },
-  { href: '/dashboard/chat', label: 'Chat', icon: MessageCircle, route: '/dashboard/chat' },
-  { href: '/dashboard/blog', label: 'Grok', icon: Bot },
+  { href: '/dashboard/chat', label: 'Groups & Chats', icon: UsersRound, route: '/dashboard/chat' },
+  { href: '/dashboard/messages', label: 'Streams', icon: Radio, route: '/dashboard/messages' },
   { href: '/dashboard/blog', label: 'Bookmarks', icon: Bookmark, route: '/dashboard/blog' },
-  { href: '/dashboard/messages', label: 'Creator Studio', icon: Rocket, route: '/dashboard/messages' },
-  { href: '/dashboard/settings', label: 'Premium', icon: Zap, badge: '50% off' },
-  { href: '/dashboard/settings', label: 'Profile', icon: UserRound, route: '/dashboard/settings' },
-  { href: '/dashboard/settings', label: 'More', icon: CircleEllipsis },
 ]
 
 export function DashboardAppShell({ children }: { children: ReactNode }) {
@@ -94,15 +84,14 @@ function DashboardChrome({ children }: { children: ReactNode }) {
 
   return (
     <div className="min-h-svh bg-black text-[#e7e9ea]">
-      <div className="mx-auto grid min-h-svh max-w-[1280px] grid-cols-1 lg:grid-cols-[275px_minmax(0,1fr)]">
-        <aside className="sticky top-0 hidden h-svh flex-col border-r border-[#2f3336] bg-black px-3 lg:flex">
-          <div className="flex h-[53px] items-center px-2">
-            <Link href="/dashboard" className="flex size-12 items-center justify-center rounded-full text-[#e7e9ea] transition hover:bg-[#181818]">
-              <span className="text-3xl leading-none">X</span>
-            </Link>
+      <TopNavbar />
+      <div className="mx-auto grid min-h-svh max-w-[1280px] grid-cols-1 pt-16 lg:grid-cols-[275px_minmax(0,1fr)]">
+        <aside className="sticky top-16 hidden h-[calc(100svh-4rem)] flex-col border-r border-[#2f3336] bg-black px-3 lg:flex">
+          <div className="space-y-4 px-2 pb-4 pt-4">
+            <PortalSearch />
           </div>
 
-          <nav className="flex-1 space-y-1 pt-2">
+          <nav className="flex-1 space-y-1">
             {navItems.map((item) => {
               const active = item.route
                 ? item.route === '/dashboard'
@@ -121,12 +110,6 @@ function DashboardChrome({ children }: { children: ReactNode }) {
                 >
                   <span className="relative">
                     <item.icon className={cn('size-[26px]', active ? 'stroke-[2.6]' : 'stroke-2')} />
-                    {item.label === 'Notifications' ? (
-                      <span className="absolute -right-1 -top-1 size-2 rounded-full bg-[#1d9bf0]" />
-                    ) : null}
-                    {item.label === 'Grok' ? (
-                      <span className="absolute -right-0.5 -top-0.5 size-2 rounded-full bg-[#1d9bf0]" />
-                    ) : null}
                   </span>
                   <span>{item.label}</span>
                   {item.badge ? (
@@ -220,10 +203,7 @@ function DashboardChrome({ children }: { children: ReactNode }) {
           </div>
         </aside>
 
-        <main className="min-w-0">
-          <TopNavbar />
-          {children}
-        </main>
+        <main className="min-w-0">{children}</main>
       </div>
 
       <nav className="fixed inset-x-0 bottom-0 z-40 border-t border-[#2f3336] bg-black/95 px-2 pb-[env(safe-area-inset-bottom)] pt-2 backdrop-blur-xl lg:hidden">
@@ -262,7 +242,7 @@ function DashboardChrome({ children }: { children: ReactNode }) {
 
 function TopNavbar() {
   return (
-    <header className="sticky top-0 z-30 h-16 border-b border-[#2f3336] bg-black/90 backdrop-blur-xl">
+    <header className="fixed inset-x-0 top-0 z-50 h-16 border-b border-[#2f3336] bg-black/92 backdrop-blur-xl">
       <div className="relative flex h-full items-center justify-center px-4">
         <Link href="/dashboard" className="flex items-center justify-center" aria-label="Realhosti Startseite">
           <img

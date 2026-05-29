@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import type { ReactNode } from 'react'
-import { MoreHorizontal, Search } from 'lucide-react'
+import { ArrowLeft, MoreHorizontal, Search } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 
@@ -17,15 +17,15 @@ export type XPerson = {
 export const xNews = [
   {
     title: "Blue Origin's New Glenn Rocket Explodes in Cape Canaveral Static Fire Test",
-    meta: 'Trending now · News · 17.8K posts',
+    meta: 'Trending now - News - 17.8K posts',
   },
   {
     title: "Jalen Williams Returns for Thunder's Game 6 Closeout Push",
-    meta: '1 hour ago · Sports · 18.9K posts',
+    meta: '1 hour ago - Sports - 18.9K posts',
   },
   {
     title: 'Australian Labor Unveils Tax Cuts for Workers and Investor Limits',
-    meta: '20 hours ago · News · 19.2K posts',
+    meta: '20 hours ago - News - 19.2K posts',
   },
 ]
 
@@ -154,7 +154,7 @@ export function PremiumPanel() {
 
 export function NewsPanel() {
   return (
-    <XPanel title="Today's News" action={<span className="text-xl text-[#e7e9ea]">×</span>}>
+    <XPanel title="Today's News" action={<span className="text-xl text-[#e7e9ea]">x</span>}>
       <div className="py-3">
         {xNews.map((item) => (
           <Link key={item.title} href="/dashboard/forum" className="block px-4 py-3 transition hover:bg-[#080808]">
@@ -216,7 +216,7 @@ export function FollowRow({
       <div className="min-w-0 flex-1">
         <div className="flex items-center gap-1">
           <p className="truncate text-[15px] font-bold text-[#e7e9ea]">{person.name}</p>
-          {person.verified ? <span className="text-[#1d9bf0]">✓</span> : null}
+          {person.verified ? <span className="text-[#1d9bf0]">&#10003;</span> : null}
         </div>
         <p className="truncate text-[15px] text-[#71767b]">{person.handle}</p>
         {person.description && !compact ? (
@@ -243,7 +243,7 @@ export function XFooter() {
       <span className="px-2">|</span>
       <span>Accessibility</span>
       <span className="px-2">|</span>
-      <span>© 2026 X Corp.</span>
+      <span>&copy; 2026 X Corp.</span>
     </div>
   )
 }
@@ -263,7 +263,7 @@ export function XPageHeader({
     <header className="sticky top-16 z-10 flex h-[53px] items-center gap-6 border-b border-[#2f3336] bg-black/80 px-4 backdrop-blur-xl">
       {backHref ? (
         <Link href={backHref} className="flex size-9 items-center justify-center rounded-full text-[#e7e9ea] transition hover:bg-[#181818]">
-          ←
+          <ArrowLeft className="size-5" />
         </Link>
       ) : null}
       <div className="min-w-0 flex-1">
