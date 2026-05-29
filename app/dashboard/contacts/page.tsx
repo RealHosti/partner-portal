@@ -9,7 +9,7 @@ const suggestions: XPerson[] = [
     handle: '@sech28',
     initials: 'SE',
     verified: true,
-    description: 'ceo von arschwasser® inc.',
+    description: 'CEO von Arschwasser Inc.',
   },
   {
     name: 'SPIEGELBRO | TWITTERNEWS',

@@ -1,7 +1,8 @@
 'use client'
 
-import { useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { Hash, MessageCircle, Search, UserRound, UsersRound, X } from 'lucide-react'
 
 type SearchItem = {
@@ -76,9 +77,15 @@ const typeIcon = {
 }
 
 export function PortalSearch() {
+  const router = useRouter()
   const [open, setOpen] = useState(false)
   const [query, setQuery] = useState('')
   const [activeIndex, setActiveIndex] = useState(0)
+
+  const navigateTo = useCallback((href: string) => {
+    setOpen(false)
+    router.push(href)
+  }, [router])
 
   const results = useMemo(() => {
     const normalized = query.trim().toLowerCase()
@@ -142,14 +149,14 @@ export function PortalSearch() {
         const target = results[activeIndex]
         if (target) {
           event.preventDefault()
-          window.location.href = target.href
+          navigateTo(target.href)
         }
       }
     }
 
     document.addEventListener('keydown', handleKeyDown)
     return () => document.removeEventListener('keydown', handleKeyDown)
-  }, [activeIndex, open, results])
+  }, [activeIndex, navigateTo, open, results])
 
   useEffect(() => {
     if (!open) {
@@ -162,27 +169,33 @@ export function PortalSearch() {
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="flex h-11 w-full items-center gap-3 rounded-xl border border-[#2f3336] bg-[#0b0b0b] px-3 text-left text-[15px] text-[#71767b] transition hover:border-[#3a3f44] hover:bg-[#111]"
+        className="group flex h-[50px] w-full max-w-[233px] items-center gap-5 rounded-full px-3 py-3 text-left text-xl leading-6 text-[#e7e9ea] transition hover:bg-[#181818]"
         aria-label="Suche oeffnen"
+        aria-haspopup="dialog"
       >
-        <Search className="size-4 shrink-0" />
+        <Search className="size-[26px] shrink-0 stroke-2" />
         <span className="min-w-0 flex-1">Search</span>
-        <span className="flex items-center gap-1 text-xs text-[#71767b]">
-          <kbd className="rounded-md border border-[#2f3336] bg-black px-1.5 py-0.5">Ctrl</kbd>
-          <kbd className="rounded-md border border-[#2f3336] bg-black px-1.5 py-0.5">K</kbd>
+        <span className="ml-auto hidden items-center gap-1 text-[11px] text-[#71767b] group-hover:text-[#e7e9ea] min-[1180px]:flex">
+          <kbd className="rounded-md border border-[#2f3336] bg-black px-1.5 py-0.5 leading-none">Ctrl</kbd>
+          <kbd className="rounded-md border border-[#2f3336] bg-black px-1.5 py-0.5 leading-none">K</kbd>
         </span>
       </button>
 
       {open ? (
-        <div className="fixed inset-0 z-[80] flex items-start justify-center bg-black/65 px-4 pt-[12vh] backdrop-blur-sm">
+        <div
+          className="fixed inset-x-0 bottom-0 top-16 z-[70] flex items-start justify-center bg-black/60 px-4 pt-5 backdrop-blur-[2px] sm:pt-8"
+          role="dialog"
+          aria-modal="true"
+          aria-label="Partner Portal Suche"
+        >
           <button
             type="button"
             className="absolute inset-0 cursor-default"
             aria-label="Suche schliessen"
             onClick={() => setOpen(false)}
           />
-          <div className="relative w-full max-w-2xl overflow-hidden rounded-2xl border border-[#2f3336] bg-[#050505] shadow-[0_24px_80px_rgb(0_0_0_/_0.55)]">
-            <div className="flex h-16 items-center gap-3 border-b border-[#2f3336] px-4">
+          <div className="relative w-full max-w-[600px] overflow-hidden rounded-2xl border border-[#2f3336] bg-black shadow-[0_20px_70px_rgb(0_0_0_/_0.7)]">
+            <div className="flex h-14 items-center gap-3 border-b border-[#2f3336] px-4">
               <Search className="size-5 shrink-0 text-[#71767b]" />
               <input
                 autoFocus
@@ -195,13 +208,14 @@ export function PortalSearch() {
               <button
                 type="button"
                 onClick={() => setOpen(false)}
-                className="rounded-lg border border-[#2f3336] px-2 py-1 text-xs font-semibold text-[#71767b] transition hover:bg-[#181818] hover:text-[#e7e9ea]"
+                className="flex size-9 items-center justify-center rounded-full text-[#71767b] transition hover:bg-[#181818] hover:text-[#e7e9ea]"
+                aria-label="Suche schliessen"
               >
-                Esc
+                <X className="size-5" />
               </button>
             </div>
 
-            <div className="max-h-[420px] overflow-y-auto p-2">
+            <div className="max-h-[min(58vh,420px)] overflow-y-auto">
               {results.length ? (
                 results.map((item, index) => {
                   const Icon = typeIcon[item.type]
@@ -211,17 +225,17 @@ export function PortalSearch() {
                       href={item.href}
                       onMouseEnter={() => setActiveIndex(index)}
                       onClick={() => setOpen(false)}
-                      className={`flex gap-3 rounded-xl px-3 py-3 transition ${
-                        activeIndex === index ? 'bg-[#181818]' : 'hover:bg-[#111]'
+                      className={`flex gap-3 border-b border-[#16181c] px-4 py-3 transition last:border-b-0 ${
+                        activeIndex === index ? 'bg-[#080808]' : 'hover:bg-[#080808]'
                       }`}
                     >
-                      <div className="flex size-10 shrink-0 items-center justify-center rounded-xl border border-[#2f3336] bg-black text-[#1d9bf0]">
+                      <div className="mt-0.5 flex size-10 shrink-0 items-center justify-center rounded-full border border-[#2f3336] bg-[#16181c] text-[#1d9bf0]">
                         <Icon className="size-5" />
                       </div>
                       <div className="min-w-0 flex-1">
                         <div className="flex items-center gap-2">
                           <p className="truncate text-[15px] font-bold text-[#e7e9ea]">{item.title}</p>
-                          <span className="rounded-full bg-[#1d9bf0]/10 px-2 py-0.5 text-xs font-semibold text-[#1d9bf0]">
+                          <span className="text-[13px] text-[#71767b]">
                             {item.type}
                           </span>
                         </div>
@@ -239,7 +253,7 @@ export function PortalSearch() {
               )}
             </div>
 
-            <div className="flex flex-wrap items-center gap-3 border-t border-[#2f3336] px-4 py-3 text-xs text-[#71767b]">
+            <div className="flex flex-wrap items-center gap-3 border-t border-[#2f3336] bg-[#050505] px-4 py-3 text-xs text-[#71767b]">
               <span>
                 <kbd className="rounded border border-[#2f3336] px-1.5">Up</kbd>{' '}
                 <kbd className="rounded border border-[#2f3336] px-1.5">Down</kbd> Navigate

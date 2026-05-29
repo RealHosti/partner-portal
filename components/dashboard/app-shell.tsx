@@ -10,7 +10,6 @@ import {
   MoreHorizontal,
   PenLine,
   Radio,
-  Search,
   UsersRound,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -38,7 +37,6 @@ type NavItem = {
 
 const navItems: NavItem[] = [
   { href: '/dashboard', label: 'Home', icon: Home, route: '/dashboard' },
-  { href: '/dashboard/forum', label: 'Explore', icon: Search, route: '/dashboard/forum' },
   { href: '/dashboard/chat', label: 'Groups & Chats', icon: UsersRound, route: '/dashboard/chat' },
   { href: '/dashboard/messages', label: 'Streams', icon: Radio, route: '/dashboard/messages' },
   { href: '/dashboard/blog', label: 'Bookmarks', icon: Bookmark, route: '/dashboard/blog' },
@@ -87,11 +85,7 @@ function DashboardChrome({ children }: { children: ReactNode }) {
       <TopNavbar />
       <div className="mx-auto grid min-h-svh max-w-[1280px] grid-cols-1 pt-16 lg:grid-cols-[275px_minmax(0,1fr)]">
         <aside className="sticky top-16 hidden h-[calc(100svh-4rem)] flex-col border-r border-[#2f3336] bg-black px-3 lg:flex">
-          <div className="space-y-4 px-2 pb-4 pt-4">
-            <PortalSearch />
-          </div>
-
-          <nav className="flex-1 space-y-1">
+          <nav className="flex-1 space-y-1 pt-4">
             {navItems.map((item) => {
               const active = item.route
                 ? item.route === '/dashboard'
@@ -100,24 +94,26 @@ function DashboardChrome({ children }: { children: ReactNode }) {
                 : false
 
               return (
-                <Link
-                  key={`${item.label}-${item.href}`}
-                  href={item.href}
-                  className={cn(
-                    'group inline-flex max-w-full items-center gap-5 rounded-full px-3 py-3 text-xl leading-6 transition hover:bg-[#181818]',
-                    active ? 'font-extrabold text-[#e7e9ea]' : 'font-normal text-[#e7e9ea]',
-                  )}
-                >
-                  <span className="relative">
-                    <item.icon className={cn('size-[26px]', active ? 'stroke-[2.6]' : 'stroke-2')} />
-                  </span>
-                  <span>{item.label}</span>
-                  {item.badge ? (
-                    <span className="rounded-md bg-[#1d9bf0] px-1.5 py-0.5 text-xs font-bold text-white">
-                      {item.badge}
+                <div key={`${item.label}-${item.href}`}>
+                  <Link
+                    href={item.href}
+                    className={cn(
+                      'group inline-flex max-w-full items-center gap-5 rounded-full px-3 py-3 text-xl leading-6 transition hover:bg-[#181818]',
+                      active ? 'font-extrabold text-[#e7e9ea]' : 'font-normal text-[#e7e9ea]',
+                    )}
+                  >
+                    <span className="relative">
+                      <item.icon className={cn('size-[26px]', active ? 'stroke-[2.6]' : 'stroke-2')} />
                     </span>
-                  ) : null}
-                </Link>
+                    <span>{item.label}</span>
+                    {item.badge ? (
+                      <span className="rounded-md bg-[#1d9bf0] px-1.5 py-0.5 text-xs font-bold text-white">
+                        {item.badge}
+                      </span>
+                    ) : null}
+                  </Link>
+                  {item.label === 'Home' ? <PortalSearch /> : null}
+                </div>
               )
             })}
 

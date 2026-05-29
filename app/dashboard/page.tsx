@@ -9,6 +9,7 @@ import {
   Bookmark,
   Calendar,
   Flag,
+  Heart,
   ImageIcon,
   Link2,
   MapPin,
@@ -243,9 +244,9 @@ function FeedPostCard({ post }: { post: FeedPost }) {
             <div className="min-w-0">
               <div className="flex flex-wrap items-center gap-1 text-[15px]">
                 <span className="truncate font-bold text-[#e7e9ea]">{post.author}</span>
-                {post.verified ? <span className="text-[#1d9bf0]">✓</span> : null}
+                {post.verified ? <span className="text-[#1d9bf0]">&#10003;</span> : null}
                 <span className="text-[#71767b]">{post.handle}</span>
-                <span className="text-[#71767b]">·</span>
+                <span className="text-[#71767b]">&middot;</span>
                 <span className="text-[#71767b]">{post.time}</span>
               </div>
               <p className="mt-0.5 text-[15px] leading-5 text-[#e7e9ea]">{post.text}</p>
@@ -274,7 +275,7 @@ function FeedPostCard({ post }: { post: FeedPost }) {
           <div className="mt-3 grid max-w-[520px] grid-cols-6 text-[13px] text-[#71767b]">
             <Metric icon={<MessageCircle className="size-[18px]" />} value={post.replies} />
             <Metric icon={<Repeat2 className="size-[18px]" />} value={post.reposts} />
-            <Metric icon={<span className="text-lg leading-none">♡</span>} value={post.likes} />
+            <Metric icon={<Heart className="size-[18px]" />} value={post.likes} />
             <Metric icon={<BarChart3 className="size-[18px]" />} value={post.views} />
             <Metric icon={<Bookmark className="size-[18px]" />} value="" />
             <Metric icon={<Send className="size-[18px]" />} value="" />
