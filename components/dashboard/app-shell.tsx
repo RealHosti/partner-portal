@@ -4,20 +4,19 @@ import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import {
   Bell,
-  Calendar,
-  CheckCircle2,
-  ChevronRight,
   ContactRound,
+  Compass,
   Home,
   LogOut,
   MessageSquare,
   MessagesSquare,
   Newspaper,
   PanelLeft,
+  PenLine,
   Settings,
   Shield,
-  Users,
   Zap,
+  MoreHorizontal,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -28,12 +27,12 @@ import { getProfileCompletion } from '@/lib/profile-completion'
 
 const navItems = [
   { href: '/dashboard', label: 'Startseite', icon: Home },
+  { href: '/dashboard/forum', label: 'Entdecken', icon: Compass },
+  { href: '/dashboard/appointments', label: 'Benachrichtigungen', icon: Bell },
   { href: '/dashboard/contacts', label: 'Kontakte', icon: ContactRound },
   { href: '/dashboard/messages', label: 'Nachrichten', icon: MessageSquare },
   { href: '/dashboard/chat', label: 'Chat', icon: MessagesSquare },
-  { href: '/dashboard/forum', label: 'Forum', icon: Users },
-  { href: '/dashboard/blog', label: 'Blog', icon: Newspaper },
-  { href: '/dashboard/appointments', label: 'Termine', icon: Calendar },
+  { href: '/dashboard/blog', label: 'Releases', icon: Newspaper },
   { href: '/dashboard/settings', label: 'Profil', icon: Settings },
 ]
 
@@ -77,26 +76,15 @@ function DashboardChrome({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <div className="min-h-svh bg-background text-foreground app-backdrop">
-      <aside className="fixed inset-y-0 left-0 z-30 hidden w-72 flex-col border-r border-border/80 bg-sidebar/92 backdrop-blur-xl lg:flex">
-        <div className="border-b border-border/80 p-5">
-          <Link href="/dashboard" className="flex items-center gap-3">
-            <div className="flex size-11 items-center justify-center rounded-lg bg-primary text-primary-foreground glow-orange">
-              <Zap className="size-7" />
-            </div>
-            <div className="leading-none">
-              <p className="font-display text-3xl tracking-wide">
-                <span className="text-primary">Real</span>
-                <span className="text-foreground">hosti</span>
-              </p>
-              <p className="mt-1 text-xs uppercase tracking-[0.22em] text-muted-foreground">
-                Partner Ops
-              </p>
-            </div>
+    <div className="min-h-svh bg-background text-foreground">
+      <aside className="fixed inset-y-0 left-0 z-30 hidden w-64 flex-col bg-background lg:flex xl:w-72">
+        <div className="px-5 pb-3 pt-4">
+          <Link href="/dashboard" className="flex size-12 items-center justify-center rounded-full text-primary transition hover:bg-secondary/60">
+            <Zap className="size-7" />
           </Link>
         </div>
 
-        <nav className="flex-1 space-y-1 p-4">
+        <nav className="flex-1 space-y-1 px-3">
           {navItems.map((item) => {
             const active = pathname === item.href || (item.href !== '/dashboard' && pathname.startsWith(item.href))
             return (
@@ -104,21 +92,35 @@ function DashboardChrome({ children }: { children: React.ReactNode }) {
                 key={item.href}
                 href={item.href}
                 className={cn(
-                  'group flex items-center gap-3 rounded-lg px-3 py-3 text-sm font-medium transition',
+                  'group inline-flex max-w-full items-center gap-4 rounded-full px-4 py-3 text-xl transition',
                   active
-                    ? 'bg-primary text-primary-foreground shadow-[0_0_24px_oklch(0.72_0.2_45_/_0.24)]'
-                    : 'text-muted-foreground hover:bg-secondary hover:text-foreground',
+                    ? 'font-bold text-foreground'
+                    : 'font-medium text-foreground/82 hover:bg-secondary/65 hover:text-foreground',
                 )}
               >
-                <item.icon className="size-5" />
+                <span className="relative">
+                  <item.icon className="size-6" />
+                  {item.label === 'Benachrichtigungen' ? (
+                    <span className="absolute -right-1 -top-1 flex size-4 items-center justify-center rounded-full bg-primary text-[10px] font-bold text-primary-foreground">
+                      1
+                    </span>
+                  ) : null}
+                </span>
                 <span>{item.label}</span>
               </Link>
             )
           })}
+
+          <Button asChild className="mt-4 h-12 w-full rounded-full text-base font-bold xl:w-[88%]">
+            <Link href="/dashboard/messages/new">
+              <PenLine className="size-5" />
+              Posten
+            </Link>
+          </Button>
         </nav>
 
-        <div className="space-y-3 border-t border-border/80 p-4">
-          <Link href="/dashboard/settings" className="portal-panel block p-3 transition hover:border-primary/60">
+        <div className="p-3">
+          <Link href="/dashboard/settings" className="block rounded-full p-3 transition hover:bg-secondary/65">
             <div className="flex items-center gap-3">
               <Avatar />
               <div className="min-w-0 flex-1">
@@ -126,34 +128,22 @@ function DashboardChrome({ children }: { children: React.ReactNode }) {
                 <p className="truncate text-xs text-muted-foreground">@{profile?.twitch_username ?? 'twitch'}</p>
               </div>
               {profile?.is_admin ? (
-                <Badge className="bg-primary text-primary-foreground">
+                <Badge className="hidden bg-primary text-primary-foreground xl:inline-flex">
                   <Shield className="size-3" />
                   Admin
                 </Badge>
               ) : null}
+              <MoreHorizontal className="size-5 text-muted-foreground" />
             </div>
-            <div className="mt-4">
-              <div className="mb-2 flex items-center justify-between gap-2 text-xs">
-                <span className="text-muted-foreground">Profilstaerke</span>
-                <span className="font-semibold text-primary">{completion.percent}%</span>
-              </div>
-              <div className="h-1.5 overflow-hidden rounded-full bg-secondary">
-                <div className="h-full rounded-full bg-primary" style={{ width: `${completion.percent}%` }} />
-              </div>
-              <div className="mt-3 flex items-center justify-between text-xs text-muted-foreground">
-                <span className="inline-flex items-center gap-1">
-                  <CheckCircle2 className="size-3.5 text-primary" />
-                  {completion.missing.length ? `${completion.missing.length} offen` : 'vollstaendig'}
-                </span>
-                <ChevronRight className="size-4" />
-              </div>
+            <div className="ml-14 mt-2 h-1 overflow-hidden rounded-full bg-secondary">
+              <div className="h-full rounded-full bg-primary" style={{ width: `${completion.percent}%` }} />
             </div>
           </Link>
         </div>
       </aside>
 
-      <div className="lg:pl-72">
-        <header className="sticky top-0 z-20 border-b border-border/80 bg-background/88 backdrop-blur-xl">
+      <div className="lg:pl-64 xl:pl-72">
+        <header className="sticky top-0 z-20 border-b border-border/80 bg-background/88 backdrop-blur-xl lg:hidden">
           <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
             <div className="flex min-w-0 items-center gap-3">
               <PanelLeft className="hidden size-5 text-primary sm:block lg:hidden" />
@@ -182,7 +172,7 @@ function DashboardChrome({ children }: { children: React.ReactNode }) {
           </div>
         </header>
 
-        <main className="mx-auto max-w-7xl px-4 py-5 pb-[calc(5.5rem+env(safe-area-inset-bottom))] sm:px-6 lg:px-8 lg:pb-8">
+        <main className="mx-auto w-full max-w-7xl px-0 pb-[calc(5.5rem+env(safe-area-inset-bottom))] sm:px-4 lg:px-0 lg:pb-0">
           {children}
         </main>
       </div>
@@ -219,13 +209,13 @@ function Avatar() {
       <img
         src={profile.twitch_avatar_url}
         alt={profile.twitch_display_name ?? 'Partner Avatar'}
-        className="size-11 rounded-lg border border-primary/50 object-cover"
+        className="size-11 rounded-full border border-primary/50 object-cover"
       />
     )
   }
 
   return (
-    <div className="flex size-11 items-center justify-center rounded-lg border border-primary/50 bg-secondary font-display text-2xl text-primary">
+    <div className="flex size-11 items-center justify-center rounded-full border border-primary/50 bg-secondary font-display text-2xl text-primary">
       {(profile?.twitch_display_name ?? 'P').charAt(0)}
     </div>
   )

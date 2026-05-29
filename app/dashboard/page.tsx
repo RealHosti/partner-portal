@@ -3,25 +3,19 @@
 import { useEffect, useMemo, useState } from 'react'
 import Link from 'next/link'
 import {
-  Bell,
   Bookmark,
-  BriefcaseBusiness,
   Calendar,
-  CheckCircle2,
   ChevronRight,
-  ContactRound,
   FileText,
   ImageIcon,
   Link2,
   MessageSquare,
   MessagesSquare,
   MoreHorizontal,
-  Newspaper,
   Plus,
   Search,
   Send,
   Settings2,
-  Sparkles,
   Users,
 } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
@@ -209,15 +203,15 @@ export default function DashboardPage() {
   )
 
   return (
-    <div className="grid min-h-[calc(100svh-6rem)] gap-0 xl:grid-cols-[minmax(0,680px)_360px] 2xl:grid-cols-[minmax(0,720px)_380px]">
+    <div className="grid min-h-svh gap-0 xl:grid-cols-[minmax(0,680px)_360px] 2xl:grid-cols-[minmax(0,720px)_380px]">
       <section className="min-w-0 border-x border-border/80 bg-background/72">
-        <div className="sticky top-16 z-10 border-b border-border/80 bg-background/92 backdrop-blur-xl">
+        <div className="sticky top-16 z-10 border-b border-border/80 bg-background/92 backdrop-blur-xl lg:top-0">
           <div className="flex items-center justify-between px-4 py-3">
             <div>
               <h2 className="text-xl font-semibold">Startseite</h2>
               <p className="text-xs text-muted-foreground">Was gerade im Partnerprogramm passiert</p>
             </div>
-            <Button asChild variant="ghost" size="icon" className="rounded-lg" aria-label="Feed Einstellungen">
+            <Button asChild variant="ghost" size="icon" className="rounded-full" aria-label="Feed Einstellungen">
               <Link href="/dashboard/settings">
                 <Settings2 className="size-5" />
               </Link>
@@ -247,7 +241,7 @@ export default function DashboardPage() {
       </section>
 
       <aside className="hidden min-w-0 border-r border-border/80 bg-background/60 px-5 py-4 xl:block">
-        <div className="sticky top-20 space-y-4">
+        <div className="sticky top-20 space-y-4 lg:top-4">
           <div className="relative">
             <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
             <Input
@@ -278,7 +272,7 @@ export default function DashboardPage() {
           <RightPanel title="Was passiert">
             <div className="divide-y divide-border/70">
               {trends.map((trend) => (
-                <Link key={trend.label} href="/dashboard/forum" className="block py-3 transition hover:text-primary">
+                <Link key={trend.label} href="/dashboard/forum" className="block rounded-2xl px-1 py-3 transition hover:bg-secondary/35 hover:text-primary">
                   <div className="flex items-start justify-between gap-3">
                     <div>
                       <p className="text-xs text-muted-foreground">Trending im Partnerportal</p>
@@ -295,13 +289,13 @@ export default function DashboardPage() {
           <RightPanel title="Wen anschauen">
             <div className="space-y-3">
               {partnerContacts.map((contact) => (
-                <Link key={contact.name} href="/dashboard/contacts" className="flex items-center gap-3 rounded-lg p-2 transition hover:bg-secondary/45">
-                  <div className="flex size-10 shrink-0 items-center justify-center rounded-lg border border-primary/45 bg-primary/15 font-semibold text-primary">
+                <Link key={contact.name} href="/dashboard/contacts" className="flex items-center gap-3 rounded-full p-2 transition hover:bg-secondary/45">
+                  <div className="flex size-10 shrink-0 items-center justify-center rounded-full border border-primary/45 bg-primary/15 font-semibold text-primary">
                     {contact.initials}
                   </div>
                   <div className="min-w-0 flex-1">
                     <p className="truncate text-sm font-semibold">{contact.name}</p>
-                    <p className="truncate text-xs text-muted-foreground">{contact.role} · {contact.company}</p>
+                    <p className="truncate text-xs text-muted-foreground">{contact.role} - {contact.company}</p>
                   </div>
                   <Button size="sm" className="h-8 rounded-full px-3">
                     Oeffnen
@@ -321,9 +315,9 @@ function Composer({ avatarUrl, name }: { avatarUrl?: string | null; name: string
     <section className="border-b border-border/80 p-4">
       <div className="flex gap-3">
         {avatarUrl ? (
-          <img src={avatarUrl} alt={name} className="size-11 rounded-lg border border-primary/45 object-cover" />
+          <img src={avatarUrl} alt={name} className="size-11 rounded-full border border-primary/45 object-cover" />
         ) : (
-          <div className="flex size-11 shrink-0 items-center justify-center rounded-lg border border-primary/45 bg-primary/15 font-semibold text-primary">
+          <div className="flex size-11 shrink-0 items-center justify-center rounded-full border border-primary/45 bg-primary/15 font-semibold text-primary">
             {getInitials(name)}
           </div>
         )}
@@ -365,7 +359,7 @@ function TimelinePostCard({ post }: { post: TimelinePost }) {
   return (
     <article className="p-4 transition hover:bg-secondary/20">
       <div className="flex gap-3">
-        <div className="flex size-11 shrink-0 items-center justify-center rounded-lg border border-primary/45 bg-primary/15 font-semibold text-primary">
+        <div className="flex size-11 shrink-0 items-center justify-center rounded-full border border-primary/45 bg-primary/15 font-semibold text-primary">
           {post.initials}
         </div>
         <div className="min-w-0 flex-1">
@@ -374,11 +368,11 @@ function TimelinePostCard({ post }: { post: TimelinePost }) {
               <div className="flex flex-wrap items-center gap-2">
                 <p className="truncate font-semibold">{post.author}</p>
                 <p className="text-sm text-muted-foreground">{post.handle}</p>
-                <span className="text-sm text-muted-foreground">·</span>
+                <span className="text-sm text-muted-foreground">-</span>
                 <time className="text-sm text-muted-foreground">{post.time}</time>
               </div>
               {post.badge ? (
-                <Badge variant="outline" className="mt-2 border-primary/45 text-primary">
+                <Badge variant="outline" className="mt-2 rounded-full border-primary/45 px-3 text-primary">
                   {post.badge}
                 </Badge>
               ) : null}
@@ -392,8 +386,8 @@ function TimelinePostCard({ post }: { post: TimelinePost }) {
           <p className="mt-2 text-sm leading-6 text-muted-foreground">{post.body}</p>
 
           {post.href ? (
-            <Link href={post.href} className="mt-4 flex items-center justify-between rounded-lg border border-border/75 bg-secondary/25 p-3 transition hover:border-primary/60">
-              <span className="text-sm font-semibold">{post.actionLabel ?? 'Oeffnen'}</span>
+            <Link href={post.href} className="mt-4 inline-flex h-10 items-center gap-2 rounded-full border border-border/75 px-4 text-sm font-semibold transition hover:border-primary/60 hover:bg-secondary/35">
+              <span>{post.actionLabel ?? 'Oeffnen'}</span>
               <ChevronRight className="size-4 text-primary" />
             </Link>
           ) : null}
@@ -412,7 +406,7 @@ function TimelinePostCard({ post }: { post: TimelinePost }) {
 
 function PostMetric({ icon, value, label }: { icon: React.ReactNode; value: number | string; label: string }) {
   return (
-    <button type="button" className="flex items-center gap-2 rounded-md py-1 text-xs transition hover:text-primary" aria-label={label}>
+    <button type="button" className="flex items-center gap-2 rounded-full px-2 py-1 text-xs transition hover:bg-secondary/35 hover:text-primary" aria-label={label}>
       {icon}
       <span>{value}</span>
     </button>
@@ -421,7 +415,7 @@ function PostMetric({ icon, value, label }: { icon: React.ReactNode; value: numb
 
 function RightPanel({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <section className="rounded-lg border border-border/80 bg-secondary/20 p-4">
+    <section className="rounded-3xl border border-border/80 bg-secondary/20 p-4">
       <h3 className="text-xl font-semibold">{title}</h3>
       <div className="mt-3">{children}</div>
     </section>
@@ -440,7 +434,7 @@ function QuickState({
   value: number
 }) {
   return (
-    <Link href={href} className="flex items-center gap-3 rounded-lg border border-border/70 bg-background/45 p-3 transition hover:border-primary/60">
+    <Link href={href} className="flex items-center gap-3 rounded-full bg-background/45 px-3 py-2.5 transition hover:bg-secondary/55">
       <span className="text-primary">{icon}</span>
       <span className="min-w-0 flex-1 text-sm">{label}</span>
       <span className="font-semibold text-primary">{value}</span>
