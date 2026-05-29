@@ -6,10 +6,15 @@ import type { ComponentType, ReactNode } from 'react'
 import {
   Bell,
   Bookmark,
+  Hash,
   Home,
+  MessageCircle,
   MoreHorizontal,
   PenLine,
+  Plus,
   Radio,
+  Search,
+  UserRound,
   UsersRound,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -42,6 +47,19 @@ const navItems: NavItem[] = [
   { href: '/dashboard/blog', label: 'Bookmarks', icon: Bookmark, route: '/dashboard/blog' },
 ]
 
+const groupItems = [
+  { name: 'Partner Lounge', meta: '12 members', unread: '3', icon: Hash },
+  { name: 'Creator Briefings', meta: 'Campaign updates', unread: '1', icon: Hash },
+  { name: 'Hardware Deals', meta: 'Specs and shipping', unread: null, icon: Hash },
+]
+
+const friendItems = [
+  { name: 'Zoe Huang', handle: '@hollyland_zoe', status: 'Online' },
+  { name: 'Elyas Fehri', handle: '@elyascontent', status: 'Drafting brief' },
+  { name: 'Manmohen Singh', handle: '@gcore_partner', status: 'Offline' },
+  { name: 'Realhosti Staff', handle: '@realhosti_staff', status: 'Online' },
+]
+
 export function DashboardAppShell({ children }: { children: ReactNode }) {
   return (
     <PortalSessionProvider requireAuth>
@@ -54,6 +72,7 @@ function DashboardChrome({ children }: { children: ReactNode }) {
   const pathname = usePathname()
   const router = useRouter()
   const { profile, status, isConfigured } = usePortalSession()
+  const showGroupsSidebar = pathname.startsWith('/dashboard/chat')
 
   const handleLogout = async () => {
     if (isConfigured) {
@@ -83,7 +102,14 @@ function DashboardChrome({ children }: { children: ReactNode }) {
   return (
     <div className="min-h-svh bg-black text-[#e7e9ea]">
       <TopNavbar />
-      <div className="mx-auto grid min-h-svh max-w-[1280px] grid-cols-1 pt-16 lg:grid-cols-[275px_minmax(0,1fr)]">
+      <div
+        className={cn(
+          'grid min-h-svh w-full grid-cols-1 pt-16 lg:mx-0',
+          showGroupsSidebar
+            ? 'lg:grid-cols-[255px_340px_minmax(0,1fr)] 2xl:max-w-[1540px]'
+            : 'lg:grid-cols-[255px_minmax(0,1fr)] 2xl:max-w-[1500px]',
+        )}
+      >
         <aside className="sticky top-16 hidden h-[calc(100svh-4rem)] flex-col border-r border-[#2f3336] bg-black px-3 lg:flex">
           <nav className="flex-1 space-y-1 pt-4">
             {navItems.map((item) => {
@@ -199,6 +225,8 @@ function DashboardChrome({ children }: { children: ReactNode }) {
           </div>
         </aside>
 
+        {showGroupsSidebar ? <GroupsChatSidebar /> : null}
+
         <main className="min-w-0">{children}</main>
       </div>
 
@@ -233,6 +261,105 @@ function DashboardChrome({ children }: { children: ReactNode }) {
         </Link>
       </Button>
     </div>
+  )
+}
+
+function GroupsChatSidebar() {
+  return (
+    <aside className="sticky top-16 hidden h-[calc(100svh-4rem)] border-r border-[#2f3336] bg-black lg:block">
+      <div className="flex h-full flex-col">
+        <header className="border-b border-[#2f3336] px-4 py-4">
+          <div className="flex items-center justify-between gap-3">
+            <div>
+              <h2 className="text-xl font-extrabold text-[#e7e9ea]">Groups & Chats</h2>
+              <p className="mt-1 text-sm text-[#71767b]">Groups, friends and DMs</p>
+            </div>
+            <button
+              type="button"
+              className="flex size-9 items-center justify-center rounded-full border border-[#2f3336] text-[#e7e9ea] transition hover:bg-[#181818]"
+              aria-label="New group"
+            >
+              <Plus className="size-4" />
+            </button>
+          </div>
+          <div className="relative mt-4">
+            <Search className="pointer-events-none absolute left-4 top-1/2 size-4 -translate-y-1/2 text-[#71767b]" />
+            <input
+              type="search"
+              placeholder="Search chats"
+              className="h-11 w-full rounded-full border border-[#2f3336] bg-[#050505] pl-11 pr-4 text-[15px] text-[#e7e9ea] outline-none placeholder:text-[#71767b] focus:border-[#1d9bf0]"
+            />
+          </div>
+        </header>
+
+        <div className="min-h-0 flex-1 overflow-y-auto py-3">
+          <SidebarSection title="Groups">
+            {groupItems.map((item) => {
+              const Icon = item.icon
+              return (
+                <Link
+                  key={item.name}
+                  href="/dashboard/chat"
+                  className="flex items-center gap-3 px-4 py-3 transition hover:bg-[#080808]"
+                >
+                  <div className="flex size-11 shrink-0 items-center justify-center rounded-full border border-[#2f3336] bg-[#16181c] text-[#1d9bf0]">
+                    <Icon className="size-5" />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate text-[15px] font-bold text-[#e7e9ea]">{item.name}</p>
+                    <p className="truncate text-sm text-[#71767b]">{item.meta}</p>
+                  </div>
+                  {item.unread ? (
+                    <span className="rounded-full bg-[#1d9bf0] px-2 py-0.5 text-xs font-bold text-white">
+                      {item.unread}
+                    </span>
+                  ) : null}
+                </Link>
+              )
+            })}
+          </SidebarSection>
+
+          <SidebarSection title="Friends">
+            {friendItems.map((item) => (
+              <Link
+                key={item.handle}
+                href="/dashboard/chat"
+                className="flex items-center gap-3 px-4 py-3 transition hover:bg-[#080808]"
+              >
+                <div className="relative flex size-11 shrink-0 items-center justify-center rounded-full border border-[#2f3336] bg-[#16181c] font-bold text-[#e7e9ea]">
+                  <UserRound className="size-5" />
+                  {item.status === 'Online' ? (
+                    <span className="absolute bottom-0 right-0 size-3 rounded-full border-2 border-black bg-emerald-400" />
+                  ) : null}
+                </div>
+                <div className="min-w-0">
+                  <p className="truncate text-[15px] font-bold text-[#e7e9ea]">{item.name}</p>
+                  <p className="truncate text-sm text-[#71767b]">{item.handle}</p>
+                </div>
+              </Link>
+            ))}
+          </SidebarSection>
+        </div>
+
+        <div className="border-t border-[#2f3336] p-4">
+          <Button asChild className="h-11 w-full rounded-full bg-[#eff3f4] text-[15px] font-bold text-black hover:bg-[#d7dbdc]">
+            <Link href="/dashboard/messages/new">
+              <MessageCircle className="size-4" />
+              New chat
+            </Link>
+          </Button>
+        </div>
+      </div>
+    </aside>
+  )
+}
+
+function SidebarSection({ title, children }: { title: string; children: ReactNode }) {
+  return (
+    <section className="pb-3">
+      <h3 className="px-4 pb-2 pt-3 text-xs font-bold uppercase tracking-[0.18em] text-[#71767b]">{title}</h3>
+      {children}
+    </section>
   )
 }
 

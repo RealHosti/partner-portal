@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
+import { createPortal } from 'react-dom'
 import { Hash, MessageCircle, Search, UserRound, UsersRound, X } from 'lucide-react'
 
 type SearchItem = {
@@ -164,6 +165,110 @@ export function PortalSearch() {
     }
   }, [open])
 
+  useEffect(() => {
+    if (!open) {
+      return
+    }
+
+    const originalOverflow = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+
+    return () => {
+      document.body.style.overflow = originalOverflow
+    }
+  }, [open])
+
+  const modal =
+    open && typeof document !== 'undefined'
+      ? createPortal(
+          <div
+            className="fixed inset-0 z-[1000] flex items-start justify-center bg-black/82 px-4 pt-24 backdrop-blur-md"
+            role="dialog"
+            aria-modal="true"
+            aria-label="Partner Portal Suche"
+          >
+            <button
+              type="button"
+              className="absolute inset-0 cursor-default"
+              aria-label="Suche schliessen"
+              onClick={() => setOpen(false)}
+            />
+            <div className="relative w-full max-w-[640px] overflow-hidden rounded-3xl border border-[#3a3f44] bg-[#050505] shadow-[0_0_0_1px_rgb(255_255_255_/_0.06),0_30px_90px_rgb(0_0_0_/_0.9),0_0_60px_rgb(255_111_0_/_0.16)]">
+              <div className="h-1 bg-gradient-to-r from-transparent via-[#ff7a00] to-transparent" />
+              <div className="flex h-16 items-center gap-3 border-b border-[#2f3336] px-5">
+                <Search className="size-5 shrink-0 text-[#1d9bf0]" />
+                <input
+                  autoFocus
+                  value={query}
+                  onChange={(event) => setQuery(event.target.value)}
+                  type="search"
+                  placeholder="Search topics, groups, profiles..."
+                  className="min-w-0 flex-1 bg-transparent text-[17px] text-[#e7e9ea] outline-none placeholder:text-[#71767b]"
+                />
+                <button
+                  type="button"
+                  onClick={() => setOpen(false)}
+                  className="flex size-9 items-center justify-center rounded-full text-[#71767b] transition hover:bg-[#181818] hover:text-[#e7e9ea]"
+                  aria-label="Suche schliessen"
+                >
+                  <X className="size-5" />
+                </button>
+              </div>
+
+              <div className="max-h-[min(58vh,440px)] overflow-y-auto">
+                {results.length ? (
+                  results.map((item, index) => {
+                    const Icon = typeIcon[item.type]
+                    return (
+                      <Link
+                        key={`${item.type}-${item.title}`}
+                        href={item.href}
+                        onMouseEnter={() => setActiveIndex(index)}
+                        onClick={() => setOpen(false)}
+                        className={`flex gap-3 border-b border-[#16181c] px-5 py-4 transition last:border-b-0 ${
+                          activeIndex === index ? 'bg-[#111214]' : 'hover:bg-[#0b0c0d]'
+                        }`}
+                      >
+                        <div className="mt-0.5 flex size-11 shrink-0 items-center justify-center rounded-full border border-[#2f3336] bg-[#16181c] text-[#1d9bf0]">
+                          <Icon className="size-5" />
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <div className="flex items-center gap-2">
+                            <p className="truncate text-[15px] font-bold text-[#e7e9ea]">{item.title}</p>
+                            <span className="text-[13px] text-[#71767b]">{item.type}</span>
+                          </div>
+                          <p className="mt-1 line-clamp-2 text-sm leading-5 text-[#71767b]">{item.description}</p>
+                        </div>
+                      </Link>
+                    )
+                  })
+                ) : (
+                  <div className="py-12 text-center">
+                    <Search className="mx-auto mb-3 size-8 text-[#71767b]" />
+                    <p className="font-semibold text-[#e7e9ea]">No results found</p>
+                    <p className="mt-1 text-sm text-[#71767b]">Try another topic, group or profile.</p>
+                  </div>
+                )}
+              </div>
+
+              <div className="flex flex-wrap items-center gap-3 border-t border-[#2f3336] bg-black px-5 py-3 text-xs text-[#71767b]">
+                <span>
+                  <kbd className="rounded border border-[#2f3336] px-1.5">Up</kbd>{' '}
+                  <kbd className="rounded border border-[#2f3336] px-1.5">Down</kbd> Navigate
+                </span>
+                <span>
+                  <kbd className="rounded border border-[#2f3336] px-1.5">Enter</kbd> Select
+                </span>
+                <span>
+                  <kbd className="rounded border border-[#2f3336] px-1.5">Esc</kbd> Close
+                </span>
+              </div>
+            </div>
+          </div>,
+          document.body,
+        )
+      : null
+
   return (
     <>
       <button
@@ -181,93 +286,7 @@ export function PortalSearch() {
         </span>
       </button>
 
-      {open ? (
-        <div
-          className="fixed inset-x-0 bottom-0 top-16 z-[70] flex items-start justify-center bg-black/60 px-4 pt-5 backdrop-blur-[2px] sm:pt-8"
-          role="dialog"
-          aria-modal="true"
-          aria-label="Partner Portal Suche"
-        >
-          <button
-            type="button"
-            className="absolute inset-0 cursor-default"
-            aria-label="Suche schliessen"
-            onClick={() => setOpen(false)}
-          />
-          <div className="relative w-full max-w-[600px] overflow-hidden rounded-2xl border border-[#2f3336] bg-black shadow-[0_20px_70px_rgb(0_0_0_/_0.7)]">
-            <div className="flex h-14 items-center gap-3 border-b border-[#2f3336] px-4">
-              <Search className="size-5 shrink-0 text-[#71767b]" />
-              <input
-                autoFocus
-                value={query}
-                onChange={(event) => setQuery(event.target.value)}
-                type="search"
-                placeholder="Search topics, groups, profiles..."
-                className="min-w-0 flex-1 bg-transparent text-[17px] text-[#e7e9ea] outline-none placeholder:text-[#71767b]"
-              />
-              <button
-                type="button"
-                onClick={() => setOpen(false)}
-                className="flex size-9 items-center justify-center rounded-full text-[#71767b] transition hover:bg-[#181818] hover:text-[#e7e9ea]"
-                aria-label="Suche schliessen"
-              >
-                <X className="size-5" />
-              </button>
-            </div>
-
-            <div className="max-h-[min(58vh,420px)] overflow-y-auto">
-              {results.length ? (
-                results.map((item, index) => {
-                  const Icon = typeIcon[item.type]
-                  return (
-                    <Link
-                      key={`${item.type}-${item.title}`}
-                      href={item.href}
-                      onMouseEnter={() => setActiveIndex(index)}
-                      onClick={() => setOpen(false)}
-                      className={`flex gap-3 border-b border-[#16181c] px-4 py-3 transition last:border-b-0 ${
-                        activeIndex === index ? 'bg-[#080808]' : 'hover:bg-[#080808]'
-                      }`}
-                    >
-                      <div className="mt-0.5 flex size-10 shrink-0 items-center justify-center rounded-full border border-[#2f3336] bg-[#16181c] text-[#1d9bf0]">
-                        <Icon className="size-5" />
-                      </div>
-                      <div className="min-w-0 flex-1">
-                        <div className="flex items-center gap-2">
-                          <p className="truncate text-[15px] font-bold text-[#e7e9ea]">{item.title}</p>
-                          <span className="text-[13px] text-[#71767b]">
-                            {item.type}
-                          </span>
-                        </div>
-                        <p className="mt-1 line-clamp-2 text-sm text-[#71767b]">{item.description}</p>
-                      </div>
-                    </Link>
-                  )
-                })
-              ) : (
-                <div className="py-12 text-center">
-                  <Search className="mx-auto mb-3 size-8 text-[#71767b]" />
-                  <p className="font-semibold text-[#e7e9ea]">No results found</p>
-                  <p className="mt-1 text-sm text-[#71767b]">Try another topic, group or profile.</p>
-                </div>
-              )}
-            </div>
-
-            <div className="flex flex-wrap items-center gap-3 border-t border-[#2f3336] bg-[#050505] px-4 py-3 text-xs text-[#71767b]">
-              <span>
-                <kbd className="rounded border border-[#2f3336] px-1.5">Up</kbd>{' '}
-                <kbd className="rounded border border-[#2f3336] px-1.5">Down</kbd> Navigate
-              </span>
-              <span>
-                <kbd className="rounded border border-[#2f3336] px-1.5">Enter</kbd> Select
-              </span>
-              <span>
-                <kbd className="rounded border border-[#2f3336] px-1.5">Esc</kbd> Close
-              </span>
-            </div>
-          </div>
-        </div>
-      ) : null}
+      {modal}
     </>
   )
 }

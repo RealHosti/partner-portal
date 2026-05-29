@@ -1,16 +1,20 @@
 'use client'
 
 import { useEffect, useMemo, useState, type FormEvent, type ReactNode } from 'react'
-import Image from 'next/image'
 import {
   AtSign,
   BriefcaseBusiness,
-  CalendarDays,
+  Building2,
   CheckCircle2,
   Globe2,
+  Grid3X3,
+  Link2,
   Loader2,
   Mail,
+  MapPin,
+  Phone,
   Save,
+  Settings,
   ShieldCheck,
   UserRound,
 } from 'lucide-react'
@@ -133,7 +137,9 @@ export default function ProfilePage() {
     })
   }, [form, profile])
 
-  const missingLabels = completionPreview.missing.slice(0, 4).map((item) => item.label)
+  const visibleSocials = socialKeys.filter((key) => form.social_links[key].trim().length > 0)
+  const location = [form.city, form.country].filter(Boolean).join(', ')
+  const bio = form.about.trim() || 'Add a short bio so partners know who they are talking to.'
 
   const updateField = (field: keyof Omit<ProfileFormState, 'social_links'>, value: string) => {
     setForm((current) => ({ ...current, [field]: value }))
@@ -206,7 +212,7 @@ export default function ProfilePage() {
     <div className="grid min-h-svh grid-cols-1 xl:grid-cols-[600px_380px]">
       <section className="min-w-0 border-x border-[#2f3336] bg-black">
         <XPageHeader
-          title="Profile"
+          title={displayName}
           subtitle={`@${handle}`}
           backHref="/dashboard"
           action={
@@ -223,65 +229,96 @@ export default function ProfilePage() {
         />
 
         <form id="profile-form" onSubmit={handleSubmit}>
-          <section className="border-b border-[#2f3336]">
-            <div className="relative h-[188px] overflow-hidden bg-[#16181c]">
-              <Image src="/images/banner.png" alt="Profile header" fill className="object-cover" priority />
-            </div>
-
-            <div className="px-4 pb-5">
-              <div className="-mt-16 flex items-end justify-between">
-                <div className="rounded-full border-4 border-black bg-black">
-                  <XAvatar src={profile?.twitch_avatar_url} name={displayName} size="xl" />
-                </div>
-                <div className="mb-3 rounded-full border border-[#2f3336] px-3 py-1.5 text-xs font-semibold text-[#71767b]">
-                  Twitch Avatar sync
+          <section className="border-b border-[#2f3336] px-5 py-7 sm:px-8">
+            <div className="grid gap-7 sm:grid-cols-[140px_minmax(0,1fr)]">
+              <div className="flex justify-center sm:justify-start">
+                <div className="rounded-full bg-gradient-to-tr from-[#ff7a00] via-[#ffb000] to-[#1d9bf0] p-1">
+                  <div className="rounded-full bg-black p-1">
+                    <XAvatar src={profile?.twitch_avatar_url} name={displayName} size="xl" />
+                  </div>
                 </div>
               </div>
 
-              <div className="mt-4">
-                <h1 className="text-2xl font-extrabold tracking-[-0.02em] text-[#e7e9ea]">{displayName}</h1>
-                <p className="text-[15px] text-[#71767b]">@{handle}</p>
-                <div className="mt-3 flex flex-wrap gap-3 text-[14px] text-[#71767b]">
-                  <InfoPill icon={<ShieldCheck className="size-4" />} label={profile?.app_role ?? 'partner'} />
-                  <InfoPill icon={<CalendarDays className="size-4" />} label="Joined May 2020" />
-                  <InfoPill icon={<AtSign className="size-4" />} label={profile?.twitch_email ?? 'OAuth connected'} />
+              <div className="min-w-0">
+                <div className="flex flex-wrap items-center gap-3">
+                  <h1 className="truncate text-2xl font-semibold text-[#e7e9ea]">{handle}</h1>
+                  <span className="inline-flex items-center gap-1 rounded-full border border-[#2f3336] px-3 py-1 text-xs font-bold text-[#e7e9ea]">
+                    <ShieldCheck className="size-4 text-[#1d9bf0]" />
+                    {profile?.app_role ?? 'partner'}
+                  </span>
+                  <span className="rounded-full border border-[#2f3336] px-3 py-1 text-xs font-bold text-[#71767b]">
+                    {form.profile_visibility}
+                  </span>
+                </div>
+
+                <div className="mt-6 grid grid-cols-3 gap-4 text-center sm:max-w-md sm:text-left">
+                  <ProfileStat value="12" label="posts" />
+                  <ProfileStat value={`${completionPreview.percent}%`} label="complete" />
+                  <ProfileStat value={String(visibleSocials.length)} label="links" />
+                </div>
+
+                <div className="mt-6 space-y-2 text-[15px] leading-5">
+                  <p className="font-bold text-[#e7e9ea]">{displayName}</p>
+                  <p className="text-[#e7e9ea]">{bio}</p>
+                  {form.company_website ? (
+                    <a href={form.company_website} className="inline-flex items-center gap-1 font-semibold text-[#1d9bf0]">
+                      <Link2 className="size-4" />
+                      {form.company_website}
+                    </a>
+                  ) : null}
+                </div>
+
+                <div className="mt-5 flex flex-wrap gap-2">
+                  {form.employment_title ? <ProfileChip icon={<BriefcaseBusiness className="size-4" />} label={form.employment_title} /> : null}
+                  {form.company_role ? <ProfileChip icon={<Building2 className="size-4" />} label={form.company_role} /> : null}
+                  {location ? <ProfileChip icon={<MapPin className="size-4" />} label={location} /> : null}
+                  <ProfileChip icon={<AtSign className="size-4" />} label={profile?.twitch_email ?? 'OAuth connected'} />
                 </div>
               </div>
             </div>
           </section>
 
-          <section className="border-b border-[#2f3336] px-4 py-5">
+          <section className="grid h-14 grid-cols-3 border-b border-[#2f3336] text-[13px] font-bold uppercase tracking-[0.14em] text-[#71767b]">
+            <button type="button" className="relative flex items-center justify-center gap-2 text-[#e7e9ea]">
+              <Grid3X3 className="size-4" />
+              Profile
+              <span className="absolute bottom-0 h-1 w-16 rounded-full bg-[#1d9bf0]" />
+            </button>
+            <button type="button" className="flex items-center justify-center gap-2 transition hover:bg-[#080808]">
+              <Building2 className="size-4" />
+              Company
+            </button>
+            <button type="button" className="flex items-center justify-center gap-2 transition hover:bg-[#080808]">
+              <Mail className="size-4" />
+              Contact
+            </button>
+          </section>
+
+          <section className="grid grid-cols-3 gap-px border-b border-[#2f3336] bg-[#2f3336]">
+            <ProfileTile title="Completion" value={`${completionPreview.percent}%`} detail="Partner readiness" />
+            <ProfileTile title="Company" value={form.employment_title || 'Open'} detail={form.company_role || 'No role yet'} />
+            <ProfileTile title="Contact" value={form.preferred_contact_method || 'Portal'} detail={form.contact_email || 'No email'} />
+          </section>
+
+          <section className="border-b border-[#2f3336] px-5 py-5 sm:px-8">
             <div className="flex items-start justify-between gap-4">
               <div>
-                <h2 className="text-xl font-extrabold text-[#e7e9ea]">Profile completion</h2>
+                <h2 className="text-xl font-extrabold text-[#e7e9ea]">Profile setup</h2>
                 <p className="mt-1 text-[15px] leading-5 text-[#71767b]">
-                  Fill the fields partners need before they contact you.
+                  Keep it short, useful and partner-friendly.
                 </p>
               </div>
-              <span className="text-2xl font-extrabold text-[#e7e9ea]">{completionPreview.percent}%</span>
+              {completionPreview.percent >= 80 ? (
+                <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/10 px-3 py-1 text-xs font-bold text-emerald-300">
+                  <CheckCircle2 className="size-4" />
+                  Ready
+                </span>
+              ) : null}
             </div>
             <Progress value={completionPreview.percent} className="mt-4 h-2 bg-[#16181c] [&>div]:bg-[#1d9bf0]" />
-            {missingLabels.length ? (
-              <div className="mt-4 flex flex-wrap gap-2">
-                {missingLabels.map((label) => (
-                  <span key={label} className="rounded-full border border-[#2f3336] px-3 py-1 text-xs font-semibold text-[#71767b]">
-                    Missing: {label}
-                  </span>
-                ))}
-              </div>
-            ) : (
-              <div className="mt-4 flex items-center gap-2 text-sm font-semibold text-emerald-400">
-                <CheckCircle2 className="size-4" />
-                Ready for partner conversations.
-              </div>
-            )}
           </section>
 
-          <FormSection
-            icon={<UserRound className="size-5" />}
-            title="Public profile"
-            description="This is what partners see first when they open your profile."
-          >
+          <EditSection icon={<Settings className="size-5" />} title="Edit public profile">
             <Field label="Visibility" htmlFor="profile_visibility">
               <Select value={form.profile_visibility} onValueChange={(value) => updateField('profile_visibility', value)}>
                 <SelectTrigger id="profile_visibility" className={selectTriggerClass}>
@@ -294,103 +331,46 @@ export default function ProfilePage() {
                 </SelectContent>
               </Select>
             </Field>
-
             <Field label="About me" htmlFor="about" wide>
               <Textarea
                 id="about"
                 value={form.about}
                 onChange={(event) => updateField('about', event.target.value)}
-                rows={5}
+                rows={4}
                 placeholder="Short context: who you are, what you do, and what partners should know before writing you."
                 className={textareaClass}
               />
             </Field>
-          </FormSection>
+          </EditSection>
 
-          <FormSection
-            icon={<BriefcaseBusiness className="size-5" />}
-            title="Company and role"
-            description="Your function, branch, location and company context."
-          >
+          <EditSection icon={<BriefcaseBusiness className="size-5" />} title="Company">
             <Field label="Company / employment" htmlFor="employment_title">
-              <Input
-                id="employment_title"
-                value={form.employment_title}
-                onChange={(event) => updateField('employment_title', event.target.value)}
-                placeholder="e.g. Realhosti Media"
-                className={inputClass}
-              />
+              <Input id="employment_title" value={form.employment_title} onChange={(event) => updateField('employment_title', event.target.value)} placeholder="e.g. Realhosti Media" className={inputClass} />
             </Field>
             <Field label="Role in company" htmlFor="company_role">
-              <Input
-                id="company_role"
-                value={form.company_role}
-                onChange={(event) => updateField('company_role', event.target.value)}
-                placeholder="e.g. Founder, Marketing, Creator"
-                className={inputClass}
-              />
+              <Input id="company_role" value={form.company_role} onChange={(event) => updateField('company_role', event.target.value)} placeholder="e.g. Founder, Marketing, Creator" className={inputClass} />
             </Field>
             <Field label="Department" htmlFor="department">
-              <Input
-                id="department"
-                value={form.department}
-                onChange={(event) => updateField('department', event.target.value)}
-                placeholder="e.g. Partnerships"
-                className={inputClass}
-              />
+              <Input id="department" value={form.department} onChange={(event) => updateField('department', event.target.value)} placeholder="e.g. Partnerships" className={inputClass} />
             </Field>
             <Field label="Industry" htmlFor="industry">
-              <Input
-                id="industry"
-                value={form.industry}
-                onChange={(event) => updateField('industry', event.target.value)}
-                placeholder="e.g. Gaming & Streaming"
-                className={inputClass}
-              />
+              <Input id="industry" value={form.industry} onChange={(event) => updateField('industry', event.target.value)} placeholder="e.g. Gaming & Streaming" className={inputClass} />
             </Field>
             <Field label="Country" htmlFor="country">
-              <Input
-                id="country"
-                value={form.country}
-                onChange={(event) => updateField('country', event.target.value)}
-                placeholder="Germany"
-                className={inputClass}
-              />
+              <Input id="country" value={form.country} onChange={(event) => updateField('country', event.target.value)} placeholder="Germany" className={inputClass} />
             </Field>
             <Field label="City" htmlFor="city">
-              <Input
-                id="city"
-                value={form.city}
-                onChange={(event) => updateField('city', event.target.value)}
-                placeholder="Berlin"
-                className={inputClass}
-              />
+              <Input id="city" value={form.city} onChange={(event) => updateField('city', event.target.value)} placeholder="Berlin" className={inputClass} />
             </Field>
             <Field label="Company website" htmlFor="company_website">
-              <Input
-                id="company_website"
-                value={form.company_website}
-                onChange={(event) => updateField('company_website', event.target.value)}
-                placeholder="https://example.com"
-                className={inputClass}
-              />
+              <Input id="company_website" value={form.company_website} onChange={(event) => updateField('company_website', event.target.value)} placeholder="https://example.com" className={inputClass} />
             </Field>
             <Field label="Company address" htmlFor="company_address">
-              <Input
-                id="company_address"
-                value={form.company_address}
-                onChange={(event) => updateField('company_address', event.target.value)}
-                placeholder="Street, ZIP, city"
-                className={inputClass}
-              />
+              <Input id="company_address" value={form.company_address} onChange={(event) => updateField('company_address', event.target.value)} placeholder="Street, ZIP, city" className={inputClass} />
             </Field>
-          </FormSection>
+          </EditSection>
 
-          <FormSection
-            icon={<Mail className="size-5" />}
-            title="Contact details"
-            description="Choose how partners should reach you outside public threads."
-          >
+          <EditSection icon={<Phone className="size-5" />} title="Contact">
             <Field label="Preferred contact" htmlFor="preferred_contact_method">
               <Select value={form.preferred_contact_method} onValueChange={(value) => updateField('preferred_contact_method', value)}>
                 <SelectTrigger id="preferred_contact_method" className={selectTriggerClass}>
@@ -405,59 +385,26 @@ export default function ProfilePage() {
               </Select>
             </Field>
             <Field label="Contact email" htmlFor="contact_email">
-              <Input
-                id="contact_email"
-                type="email"
-                value={form.contact_email}
-                onChange={(event) => updateField('contact_email', event.target.value)}
-                placeholder="mail@example.com"
-                className={inputClass}
-              />
+              <Input id="contact_email" type="email" value={form.contact_email} onChange={(event) => updateField('contact_email', event.target.value)} placeholder="mail@example.com" className={inputClass} />
             </Field>
             <Field label="Mobile phone" htmlFor="mobile_phone">
-              <Input
-                id="mobile_phone"
-                value={form.mobile_phone}
-                onChange={(event) => updateField('mobile_phone', event.target.value)}
-                placeholder="+49 ..."
-                className={inputClass}
-              />
+              <Input id="mobile_phone" value={form.mobile_phone} onChange={(event) => updateField('mobile_phone', event.target.value)} placeholder="+49 ..." className={inputClass} />
             </Field>
             <Field label="Phone" htmlFor="phone">
-              <Input
-                id="phone"
-                value={form.phone}
-                onChange={(event) => updateField('phone', event.target.value)}
-                placeholder="+49 ..."
-                className={inputClass}
-              />
+              <Input id="phone" value={form.phone} onChange={(event) => updateField('phone', event.target.value)} placeholder="+49 ..." className={inputClass} />
             </Field>
-          </FormSection>
+          </EditSection>
 
-          <FormSection
-            icon={<Globe2 className="size-5" />}
-            title="Social links"
-            description="Add only channels partners should actually use."
-          >
+          <EditSection icon={<Globe2 className="size-5" />} title="Social links">
             {socialKeys.map((key) => (
               <Field key={key} label={socialLabel[key]} htmlFor={`social_${key}`}>
-                <Input
-                  id={`social_${key}`}
-                  value={form.social_links[key]}
-                  onChange={(event) => updateSocial(key, event.target.value)}
-                  placeholder={socialPlaceholder[key]}
-                  className={inputClass}
-                />
+                <Input id={`social_${key}`} value={form.social_links[key]} onChange={(event) => updateSocial(key, event.target.value)} placeholder={socialPlaceholder[key]} className={inputClass} />
               </Field>
             ))}
-          </FormSection>
+          </EditSection>
 
-          {notice ? (
-            <StatusMessage tone="success" message={notice} />
-          ) : null}
-          {error ? (
-            <StatusMessage tone="error" message={error} />
-          ) : null}
+          {notice ? <StatusMessage tone="success" message={notice} /> : null}
+          {error ? <StatusMessage tone="error" message={error} /> : null}
         </form>
       </section>
 
@@ -495,27 +442,42 @@ const socialPlaceholder: Record<SocialKey, string> = {
   tiktok: 'https://tiktok.com/@name',
 }
 
-function FormSection({
-  icon,
-  title,
-  description,
-  children,
-}: {
-  icon: ReactNode
-  title: string
-  description: string
-  children: ReactNode
-}) {
+function ProfileStat({ value, label }: { value: string; label: string }) {
   return (
-    <section className="border-b border-[#2f3336] px-4 py-5">
-      <div className="mb-5 flex gap-3">
-        <div className="flex size-10 shrink-0 items-center justify-center rounded-full border border-[#2f3336] bg-[#16181c] text-[#1d9bf0]">
+    <div>
+      <p className="text-[17px] font-extrabold text-[#e7e9ea]">{value}</p>
+      <p className="text-sm text-[#71767b]">{label}</p>
+    </div>
+  )
+}
+
+function ProfileChip({ icon, label }: { icon: ReactNode; label: string }) {
+  return (
+    <span className="inline-flex max-w-full items-center gap-1.5 rounded-full border border-[#2f3336] bg-[#050505] px-3 py-1.5 text-sm font-semibold text-[#e7e9ea]">
+      {icon}
+      <span className="truncate">{label}</span>
+    </span>
+  )
+}
+
+function ProfileTile({ title, value, detail }: { title: string; value: string; detail: string }) {
+  return (
+    <div className="min-h-28 bg-black p-4">
+      <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#71767b]">{title}</p>
+      <p className="mt-2 truncate text-xl font-extrabold text-[#e7e9ea]">{value}</p>
+      <p className="mt-1 line-clamp-2 text-sm text-[#71767b]">{detail}</p>
+    </div>
+  )
+}
+
+function EditSection({ icon, title, children }: { icon: ReactNode; title: string; children: ReactNode }) {
+  return (
+    <section className="border-b border-[#2f3336] px-5 py-6 sm:px-8">
+      <div className="mb-5 flex items-center gap-3">
+        <div className="flex size-9 shrink-0 items-center justify-center rounded-full border border-[#2f3336] bg-[#16181c] text-[#1d9bf0]">
           {icon}
         </div>
-        <div>
-          <h2 className="text-xl font-extrabold text-[#e7e9ea]">{title}</h2>
-          <p className="mt-1 text-[15px] leading-5 text-[#71767b]">{description}</p>
-        </div>
+        <h2 className="text-xl font-extrabold text-[#e7e9ea]">{title}</h2>
       </div>
       <div className="grid gap-4 sm:grid-cols-2">{children}</div>
     </section>
@@ -543,23 +505,14 @@ function Field({
   )
 }
 
-function InfoPill({ icon, label }: { icon: ReactNode; label: string }) {
-  return (
-    <span className="inline-flex max-w-full items-center gap-1.5 rounded-full border border-[#2f3336] px-3 py-1">
-      {icon}
-      <span className="truncate">{label}</span>
-    </span>
-  )
-}
-
 function StatusMessage({ tone, message }: { tone: 'success' | 'error'; message: string }) {
   const success = tone === 'success'
   return (
     <div
       className={
         success
-          ? 'mx-4 my-5 rounded-2xl border border-emerald-500/30 bg-emerald-500/10 px-4 py-3 text-sm font-semibold text-emerald-300'
-          : 'mx-4 my-5 rounded-2xl border border-[#f4212e]/40 bg-[#f4212e]/10 px-4 py-3 text-sm font-semibold text-[#ff818a]'
+          ? 'mx-5 my-5 rounded-2xl border border-emerald-500/30 bg-emerald-500/10 px-4 py-3 text-sm font-semibold text-emerald-300 sm:mx-8'
+          : 'mx-5 my-5 rounded-2xl border border-[#f4212e]/40 bg-[#f4212e]/10 px-4 py-3 text-sm font-semibold text-[#ff818a] sm:mx-8'
       }
     >
       {message}
