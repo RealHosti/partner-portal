@@ -27,9 +27,9 @@ import { PortalSessionProvider, usePortalSession } from '@/hooks/use-auth-profil
 import { getProfileCompletion } from '@/lib/profile-completion'
 
 const navItems = [
-  { href: '/dashboard', label: 'Hub', icon: Home },
+  { href: '/dashboard', label: 'Startseite', icon: Home },
   { href: '/dashboard/contacts', label: 'Kontakte', icon: ContactRound },
-  { href: '/dashboard/messages', label: 'Inbox', icon: MessageSquare },
+  { href: '/dashboard/messages', label: 'Nachrichten', icon: MessageSquare },
   { href: '/dashboard/chat', label: 'Chat', icon: MessagesSquare },
   { href: '/dashboard/forum', label: 'Forum', icon: Users },
   { href: '/dashboard/blog', label: 'Blog', icon: Newspaper },
