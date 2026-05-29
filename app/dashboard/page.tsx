@@ -158,7 +158,7 @@ export default function DashboardPage() {
   return (
     <div className="grid min-h-svh grid-cols-1 xl:grid-cols-[600px_380px]">
       <section className="min-w-0 border-x border-[#2f3336] bg-black">
-        <header className="sticky top-0 z-10 border-b border-[#2f3336] bg-black/80 backdrop-blur-xl">
+        <header className="sticky top-16 z-10 border-b border-[#2f3336] bg-black/80 backdrop-blur-xl">
           <div className="grid h-[53px] grid-cols-2 text-[15px] font-bold">
             <button type="button" className="relative text-[#e7e9ea]">
               For you

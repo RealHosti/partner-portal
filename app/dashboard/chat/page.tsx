@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { Archive, ChevronDown, MailPlus, MessageCircle, Search, Settings } from 'lucide-react'
+import { Archive, ChevronDown, MailPlus, MessageCircle, Search } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 
@@ -59,9 +59,6 @@ export default function ChatPage() {
         </div>
       </section>
 
-      <button type="button" className="fixed right-5 top-4 hidden size-9 items-center justify-center rounded-full text-[#e7e9ea] transition hover:bg-[#181818] xl:flex" aria-label="Settings">
-        <Settings className="size-5" />
-      </button>
     </div>
   )
 }

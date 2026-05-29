@@ -121,7 +121,7 @@ export function XPanel({
 export function XRightRail({ mode = 'home' }: { mode?: 'home' | 'simple' | 'profile' }) {
   return (
     <aside className="hidden w-[350px] shrink-0 pl-[30px] xl:block">
-      <div className="sticky top-0 space-y-4 py-3">
+      <div className="sticky top-16 space-y-4 py-3">
         <XSearchBox />
         {mode === 'home' ? <PremiumPanel /> : null}
         <NewsPanel />
@@ -260,7 +260,7 @@ export function XPageHeader({
   action?: ReactNode
 }) {
   return (
-    <header className="sticky top-0 z-10 flex h-[53px] items-center gap-6 border-b border-[#2f3336] bg-black/80 px-4 backdrop-blur-xl">
+    <header className="sticky top-16 z-10 flex h-[53px] items-center gap-6 border-b border-[#2f3336] bg-black/80 px-4 backdrop-blur-xl">
       {backHref ? (
         <Link href={backHref} className="flex size-9 items-center justify-center rounded-full text-[#e7e9ea] transition hover:bg-[#181818]">
           ←

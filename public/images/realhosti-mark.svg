@@ -1,0 +1,53 @@
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="512" height="512" fill="black"/>
+  <g filter="url(#outerGlow)">
+    <path d="M256 52L462 438H372L256 225L140 438H50L256 52Z" fill="url(#outerFace)"/>
+    <path d="M256 52L462 438H404L256 161L108 438H50L256 52Z" fill="url(#edgeLight)" fill-opacity=".86"/>
+    <path d="M256 125L401 438H346L256 265L166 438H111L256 125Z" fill="#210B02"/>
+    <path d="M256 125L401 438H346L256 265V125Z" fill="url(#rightFacet)"/>
+    <path d="M256 125L166 438H111L256 125Z" fill="url(#leftFacet)"/>
+    <path d="M256 265L346 438H282L256 390L230 438H166L256 265Z" fill="url(#innerWing)"/>
+    <path d="M256 52L462 438" stroke="#FFE38D" stroke-width="8" stroke-linecap="round"/>
+    <path d="M256 52L50 438" stroke="#FFB21A" stroke-width="8" stroke-linecap="round"/>
+    <path d="M111 438L256 125L401 438" stroke="#FF4B00" stroke-width="5" stroke-linejoin="round"/>
+    <path d="M166 438L256 265L346 438" stroke="#FFE27A" stroke-width="5" stroke-linejoin="round"/>
+  </g>
+  <defs>
+    <linearGradient id="outerFace" x1="82" y1="417" x2="374" y2="80" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FF4A00"/>
+      <stop offset=".4" stop-color="#FF8A00"/>
+      <stop offset=".72" stop-color="#FFD33D"/>
+      <stop offset="1" stop-color="#FFF0A3"/>
+    </linearGradient>
+    <linearGradient id="edgeLight" x1="121" y1="422" x2="409" y2="87" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FF3D00"/>
+      <stop offset=".52" stop-color="#FF8A00"/>
+      <stop offset="1" stop-color="#FFF2A8"/>
+    </linearGradient>
+    <linearGradient id="rightFacet" x1="256" y1="134" x2="371" y2="424" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFA000"/>
+      <stop offset=".46" stop-color="#FF5A00"/>
+      <stop offset="1" stop-color="#5C1600"/>
+    </linearGradient>
+    <linearGradient id="leftFacet" x1="133" y1="421" x2="255" y2="136" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FF7B00"/>
+      <stop offset=".44" stop-color="#FFB000"/>
+      <stop offset="1" stop-color="#FFF0A3"/>
+    </linearGradient>
+    <linearGradient id="innerWing" x1="170" y1="433" x2="332" y2="283" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FF4300"/>
+      <stop offset=".5" stop-color="#FFB000"/>
+      <stop offset="1" stop-color="#FFF5B0"/>
+    </linearGradient>
+    <filter id="outerGlow" x="10" y="12" width="492" height="466" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+      <feFlood flood-opacity="0" result="BackgroundImageFix"/>
+      <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
+      <feOffset/>
+      <feGaussianBlur stdDeviation="18"/>
+      <feComposite in2="hardAlpha" operator="out"/>
+      <feColorMatrix type="matrix" values="0 0 0 0 1 0 0 0 0 0.35 0 0 0 0 0 0 0 0 1 0"/>
+      <feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow"/>
+      <feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow" result="shape"/>
+    </filter>
+  </defs>
+</svg>
