@@ -1,41 +1,89 @@
 'use client'
 
-import { PartyPopper, Settings } from 'lucide-react'
+import { CalendarCheck, Clock, Plus, Video } from 'lucide-react'
+import Link from 'next/link'
+import { Button } from '@/components/ui/button'
 import { XPageHeader, XRightRail } from '@/components/dashboard/x-ui'
 
-export default function NotificationsPage() {
+const appointments = [
+  {
+    title: 'Kickoff Hardware-Kampagne',
+    company: 'HOLLYLAND',
+    date: '03. Juni',
+    time: '14:30',
+    status: 'Angefragt',
+  },
+  {
+    title: 'Briefing Review',
+    company: 'Realhosti Staff',
+    date: '06. Juni',
+    time: '18:00',
+    status: 'Offen',
+  },
+  {
+    title: 'Asset-Freigabe',
+    company: 'Gcore',
+    date: '10. Juni',
+    time: '11:15',
+    status: 'Geplant',
+  },
+]
+
+export default function AppointmentsPage() {
   return (
     <div className="grid min-h-svh grid-cols-1 xl:grid-cols-[600px_380px]">
       <section className="min-w-0 border-x border-[#2f3336] bg-black">
         <XPageHeader
-          title="Notifications"
+          title="Termine"
+          subtitle="Calls, Abstimmungen und Freigaben"
           action={
-            <button type="button" className="flex size-9 items-center justify-center rounded-full text-[#e7e9ea] transition hover:bg-[#181818]" aria-label="Notification settings">
-              <Settings className="size-5" />
-            </button>
+            <Button asChild className="h-9 rounded-full bg-[#eff3f4] px-4 text-[15px] font-bold text-black hover:bg-[#d7dbdc]">
+              <Link href="/dashboard/messages/new">
+                <Plus className="size-4" />
+                Neu
+              </Link>
+            </Button>
           }
         />
 
-        <div className="grid h-[53px] grid-cols-2 border-b border-[#2f3336] text-[15px] font-bold">
-          <button type="button" className="relative text-[#e7e9ea]">
-            All
-            <span className="absolute bottom-0 left-1/2 h-1 w-14 -translate-x-1/2 rounded-full bg-[#1d9bf0]" />
-          </button>
-          <button type="button" className="text-[#71767b] transition hover:bg-[#080808]">
-            Mentions
-          </button>
-        </div>
-
-        <article className="flex gap-3 border-b border-[#2f3336] px-7 py-4">
-          <PartyPopper className="mt-0.5 size-8 shrink-0 text-[#f91880]" />
-          <div className="min-w-0 flex-1">
-            <p className="text-[15px] leading-5 text-[#e7e9ea]">
-              It's your X anniversary! Celebrate with a special post created just for you ·{' '}
-              <span className="text-[#71767b]">May 23</span>
-            </p>
+        <section className="border-b border-[#2f3336] px-5 py-5">
+          <div className="rounded-3xl border border-[#2f3336] bg-[#050505] p-5">
+            <div className="flex items-start gap-4">
+              <div className="flex size-12 shrink-0 items-center justify-center rounded-full bg-[#1d9bf0]/12 text-[#1d9bf0]">
+                <CalendarCheck className="size-6" />
+              </div>
+              <div>
+                <h2 className="text-xl font-extrabold text-[#e7e9ea]">Naechster Termin</h2>
+                <p className="mt-1 text-[15px] leading-5 text-[#71767b]">
+                  Kickoff Hardware-Kampagne mit HOLLYLAND am 03. Juni um 14:30.
+                </p>
+              </div>
+            </div>
           </div>
-          <span className="text-[#71767b]">•••</span>
-        </article>
+        </section>
+
+        <div className="divide-y divide-[#2f3336]">
+          {appointments.map((appointment) => (
+            <article key={appointment.title} className="flex gap-4 px-5 py-4 transition hover:bg-[#080808]">
+              <div className="flex size-11 shrink-0 items-center justify-center rounded-full border border-[#2f3336] bg-[#16181c] text-[#1d9bf0]">
+                <Video className="size-5" />
+              </div>
+              <div className="min-w-0 flex-1">
+                <div className="flex flex-wrap items-center gap-2">
+                  <p className="font-bold text-[#e7e9ea]">{appointment.title}</p>
+                  <span className="rounded-full border border-[#2f3336] px-2 py-0.5 text-xs font-bold text-[#71767b]">
+                    {appointment.status}
+                  </span>
+                </div>
+                <p className="mt-1 text-[15px] text-[#71767b]">{appointment.company}</p>
+                <p className="mt-2 inline-flex items-center gap-2 text-sm font-semibold text-[#e7e9ea]">
+                  <Clock className="size-4 text-[#71767b]" />
+                  {appointment.date} - {appointment.time}
+                </p>
+              </div>
+            </article>
+          ))}
+        </div>
       </section>
 
       <XRightRail mode="simple" />

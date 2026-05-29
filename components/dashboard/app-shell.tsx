@@ -6,13 +6,14 @@ import type { ComponentType, ReactNode } from 'react'
 import {
   Bell,
   Bookmark,
+  CalendarCheck,
+  CalendarDays,
   Hash,
   Home,
   MessageCircle,
   MoreHorizontal,
   PenLine,
   Plus,
-  Radio,
   Search,
   UserRound,
   UsersRound,
@@ -42,8 +43,10 @@ type NavItem = {
 
 const navItems: NavItem[] = [
   { href: '/dashboard', label: 'Home', icon: Home, route: '/dashboard' },
+  { href: '/dashboard/notifications', label: 'Benachrichtigungen', icon: Bell, route: '/dashboard/notifications' },
   { href: '/dashboard/chat', label: 'Groups & Chats', icon: UsersRound, route: '/dashboard/chat' },
-  { href: '/dashboard/messages', label: 'Streams', icon: Radio, route: '/dashboard/messages' },
+  { href: '/dashboard/events', label: 'Events', icon: CalendarDays, route: '/dashboard/events' },
+  { href: '/dashboard/appointments', label: 'Termine', icon: CalendarCheck, route: '/dashboard/appointments' },
   { href: '/dashboard/blog', label: 'Bookmarks', icon: Bookmark, route: '/dashboard/blog' },
 ]
 
@@ -104,10 +107,10 @@ function DashboardChrome({ children }: { children: ReactNode }) {
       <TopNavbar />
       <div
         className={cn(
-          'grid min-h-svh w-full grid-cols-1 pt-16 lg:mx-0',
+          'mx-auto grid min-h-svh w-full grid-cols-1 pt-16',
           showGroupsSidebar
-            ? 'lg:grid-cols-[255px_340px_minmax(0,1fr)] 2xl:max-w-[1540px]'
-            : 'lg:grid-cols-[255px_minmax(0,1fr)] 2xl:max-w-[1500px]',
+            ? 'max-w-[1540px] lg:grid-cols-[255px_340px_minmax(0,1fr)]'
+            : 'max-w-[1280px] lg:grid-cols-[255px_minmax(0,1fr)]',
         )}
       >
         <aside className="sticky top-16 hidden h-[calc(100svh-4rem)] flex-col border-r border-[#2f3336] bg-black px-3 lg:flex">
@@ -373,14 +376,6 @@ function TopNavbar() {
             alt="Realhosti Logo"
             className="size-11 object-contain"
           />
-        </Link>
-        <Link
-          href="/dashboard/appointments"
-          className="absolute right-4 flex size-10 items-center justify-center rounded-full text-[#e7e9ea] transition hover:bg-[#181818]"
-          aria-label="Benachrichtigungen"
-        >
-          <Bell className="size-5" />
-          <span className="absolute right-2 top-2 size-2 rounded-full bg-[#1d9bf0]" />
         </Link>
       </div>
     </header>
